@@ -18,9 +18,9 @@
   --glass-shadow:  0 4px 24px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.08);
 
   /* Layout */
-  --sb-w:      56px;
+  --sb-w:      50px;
   --sb-gap:    8px;
-  --sb-r:      100px;  /* full pill */
+  --sb-r:      999px;  /* full pill */
   --panel-r:   20px;   /* panels stay rounded but not pill */
 }
 
@@ -48,6 +48,7 @@ body {
   background: center/cover fixed no-repeat;
   /* Space for floating sidebar */
   padding-left: calc(var(--sb-w) + var(--sb-gap) * 2 + 8px);
+  transition: padding-left .25s ease, padding-right .25s ease;
 }
 
 /* ═══════════════════════════════
@@ -64,8 +65,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 12px 0;
-  gap: 4px;
+  padding: 10px 0;
+  gap: 2px;
 
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
@@ -77,44 +78,45 @@ body {
 
 /* Logo button at top */
 .sb-logo-btn {
-  width: 36px; height: 36px;
+  width: 34px; height: 34px;
   border: none; background: none;
   cursor: pointer; padding: 0;
-  border-radius: 10px;
+  border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   transition: transform .2s, opacity .2s;
   margin-bottom: 6px;
   flex-shrink: 0;
 }
 .sb-logo-btn img {
-  width: 30px; height: 30px;
+  width: 28px; height: 28px;
   object-fit: contain;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,.4));
 }
 .sb-logo-btn:hover { transform: scale(1.1); opacity: .85; }
 
-/* Icon buttons */
+/* Icon buttons — bo tròn hoàn toàn, giống Opera */
 .sb-btn {
-  width: 40px; height: 40px;
-  border-radius: 12px; border: none;
+  width: 38px; height: 38px;
+  border-radius: 50%; border: none;
   cursor: pointer; background: transparent;
   display: flex; align-items: center; justify-content: center;
   color: var(--muted);
   transition: color .18s, background .18s;
   position: relative;
+  flex-shrink: 0;
 }
-.sb-btn svg { width: 18px; height: 18px; }
+.sb-btn svg { width: 17px; height: 17px; }
 .sb-btn:hover { color: var(--text); background: rgba(0,0,0,.06); }
 body.dark .sb-btn:hover { background: rgba(255,255,255,.08); }
-.sb-btn.active { color: var(--accent); background: rgba(26,143,160,.1); }
+.sb-btn.active { color: var(--accent); background: rgba(26,143,160,.12); }
 .sb-btn.active::before {
   content: ''; position: absolute;
-  left: 0; top: 50%; transform: translateY(-50%);
-  width: 3px; height: 16px;
-  border-radius: 0 3px 3px 0;
+  left: 3px; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 14px;
+  border-radius: 100px;
   background: var(--accent);
 }
-.sb-spacer { flex: 1; }
+.sb-spacer { flex: 1; min-height: 8px; }
 
 /* Upload button special */
 .sb-upload-btn {
@@ -123,7 +125,7 @@ body.dark .sb-btn:hover { background: rgba(255,255,255,.08); }
 }
 .sb-upload-btn:hover { color: var(--text); background: rgba(0,0,0,.06); }
 body.dark .sb-upload-btn:hover { background: rgba(255,255,255,.08); }
-.sb-upload-btn svg { width: 20px; height: 20px; stroke-width: 1.7; }
+.sb-upload-btn svg { width: 18px; height: 18px; stroke-width: 1.8; }
 
 /* Music playing pulse */
 #music-btn.playing { color: var(--accent); }
@@ -141,7 +143,7 @@ body.sidebar-right {
   padding-right: calc(var(--sb-w) + var(--sb-gap) * 2 + 8px);
 }
 body.sidebar-right .sidebar { left: auto; right: var(--sb-gap); }
-body.sidebar-right .sb-btn.active::before { left: auto; right: 0; border-radius: 3px 0 0 3px; }
+body.sidebar-right .sb-btn.active::before { left: auto; right: 3px; }
 
 /* ═══════════════════════════════
    UNIFIED CENTER MODAL SYSTEM
@@ -248,10 +250,10 @@ body.dark .sb-sr-item:hover { background: rgba(255,255,255,.07); }
 .sb-suggest-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
 .sb-suggest-item {
   position: relative; border-radius: 16px; overflow: hidden; cursor: pointer;
-  aspect-ratio: 16/9; flex-shrink: 0;
+  flex-shrink: 0; background: rgba(0,0,0,.15);
 }
-.sb-suggest-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s ease; }
-.sb-suggest-item:hover img { transform: scale(1.03); }
+.sb-suggest-item img { width: 100%; height: auto; display: block; transition: transform .3s ease; }
+.sb-suggest-item:hover img { transform: scale(1.02); }
 .sb-suggest-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,.75)); padding: 32px 16px 14px; }
 .sb-suggest-album { font-size: 11px; color: rgba(255,255,255,.65); margin-bottom: 2px; }
 .sb-suggest-name  { font-size: 16px; font-weight: 600; color: #fff; }
@@ -261,23 +263,24 @@ body.dark .sb-sr-item:hover { background: rgba(255,255,255,.07); }
 ═══════════════════════════════ */
 .settings-popup {
   position: fixed;
-  top: 0; left: 0; bottom: 0;
+  top: var(--sb-gap); bottom: var(--sb-gap);
+  left: calc(var(--sb-gap) * 2 + var(--sb-w));
   width: 340px;
   padding: 22px 20px;
-  z-index: 900;
-  display: none;
+  z-index: 480; /* thấp hơn sidebar (500) để không đè lên */
 
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border-right: 1px solid var(--glass-border);
-  border-radius: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--panel-r);
   box-shadow: var(--glass-shadow);
   overflow-y: auto;
   overscroll-behavior: contain;
+  display: none;
 }
 .settings-popup.open { display: block; } /* không animation, hiện tức thì */
-body.sidebar-right .settings-popup { left: auto; right: 0; border-right: none; border-left: 1px solid var(--glass-border); }
+body.sidebar-right .settings-popup { left: auto; right: calc(var(--sb-gap) * 2 + var(--sb-w)); }
 
 .settings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .settings-close-btn {
@@ -369,6 +372,9 @@ body.sidebar-right #sidebar-edge-trigger { left: auto; right: 0; }
 body.sidebar-right .sidebar.autohide:not(.revealed) {
   transform: translateX(calc(100% + var(--sb-gap) + 8px));
 }
+/* Trả lại không gian cho nội dung khi sidebar auto-hide đang ẩn */
+body.autohide-collapsed { transition: padding .25s ease; padding-left: calc(var(--sb-gap) + 8px) !important; }
+body.autohide-collapsed.sidebar-right { padding-left: calc(var(--sb-gap) + 8px) !important; padding-right: calc(var(--sb-gap) + 8px) !important; }
 
 /* ═══════════════════════════════
    TOP SEARCH BAR (trang chủ)
@@ -425,6 +431,10 @@ body.dark .tsb-item:hover { background: rgba(255,255,255,.08); }
    MUSIC PICKER — Glass
 ═══════════════════════════════ */
 /* Music Picker — dùng chung .center-modal, style nội dung */
+/* Music Picker — không animation, hiện/ẩn tức thì (khác Search/AI vẫn có fade+scale) */
+.music-picker { transition: none !important; }
+.music-picker:not(.open) { display: none; }
+.music-picker.open { display: flex; opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
 .music-picker-inner { padding: 20px; height: 100%; display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain; }
 
 .music-picker-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--glass-border); }
@@ -569,44 +579,6 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
 .lb-prev { left: -58px; }
 .lb-next { right: -58px; }
 
-/* ═══════════════════════════════
-   FOOTER
-═══════════════════════════════ */
-footer {
-  text-align: center; padding: 28px 32px;
-  color: rgba(0,0,0,.45); font-size: 13px;
-  background: rgba(240,247,250,.7); backdrop-filter: blur(8px);
-  border-top: 1px solid rgba(0,0,0,.06);
-}
-footer a { color: var(--accent); text-decoration: none; font-weight: 500; transition: opacity .2s; }
-footer a:hover { opacity: .75; }
-.footer-projects { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.06); }
-.footer-projects-title { display: block; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-.footer-projects-links { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-.footer-projects-links a { font-size: 13px; color: var(--accent); text-decoration: none; padding: 5px 14px; border-radius: 100px; border: 1px solid rgba(59,191,176,.25); transition: all .2s; }
-.footer-projects-links a:hover { background: rgba(59,191,176,.1); }
-/* lass dark hoặc thuộc tính bạn dùng để kích hoạt Dark Mode */
-body.dark footer {
-    background: rgba(15, 18, 20, .85);
-    color: rgba(255, 255, 255, .5);
-    backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(255, 255, 255, .05);
-}
-
-body.dark .footer-projects {
-    border-top: 1px solid rgba(255, 255, 255, .05);
-}
-
-/* Dự án Nux/Underave Dark Mode */
-body.dark .footer-projects-links a {
-    color: var(--accent);
-    border: 1px solid rgba(255, 255, 255, .1);
-    background: rgba(255, 255, 255, .02);
-}
-
-body.dark .footer-projects-links a:hover {
-    background: rgba(59, 191, 176, .15); /* Màu hover đặc trưng của bạn */
-}
 
 /* ═══════════════════════════════
    ALBUM BACK BUTTON
@@ -899,7 +871,7 @@ body.dark .footer-projects-links a:hover {
   }
   #sb-upload svg { width: 22px; height: 22px; stroke-width: 1.6; }
 
-  /* Search / AI / Music — bottom sheet gần full, đồng bộ 3 cái, có overlay tối */
+  /* Search / AI / Music — bottom sheet gần full, đồng bộ 3 cái, có overlay tối, KHÔNG animation (tránh lag) */
   .center-modal,
   .sb-panel, .ai-panel, .music-picker {
     top: var(--sb-gap) !important;
@@ -912,7 +884,7 @@ body.dark .footer-projects-links a:hover {
     transform: none !important;
     border-radius: var(--panel-r) !important;
     overflow: hidden;
-    transition: height .3s cubic-bezier(.4,0,.2,1), opacity .2s !important;
+    transition: none !important;
   }
   .center-modal.open,
   .sb-panel.open, .ai-panel.open, .music-picker.open {
@@ -922,10 +894,11 @@ body.dark .footer-projects-links a:hover {
     opacity: 1 !important;
     pointer-events: auto !important;
   }
+  .modal-overlay { transition: none !important; }
   .sb-panel-inner { width: 100% !important; }
   .ai-panel-inner { width: 100% !important; }
 
-  /* Settings drawer — mobile: bottom sheet gần full, giống 3 cái trên */
+  /* Settings drawer — mobile: bottom sheet gần full, KHÔNG animation */
   .settings-popup {
     top: auto !important; left: var(--sb-gap) !important; right: var(--sb-gap) !important;
     bottom: calc(54px + var(--sb-gap) * 2) !important;
@@ -933,7 +906,7 @@ body.dark .footer-projects-links a:hover {
     border-radius: var(--panel-r) !important;
     border-right: none !important; border-left: none !important;
     overflow: hidden;
-    transition: height .3s cubic-bezier(.4,0,.2,1) !important;
+    transition: none !important;
   }
   .settings-popup.open {
     height: calc(100vh - 54px - var(--sb-gap) * 3 - 4px) !important;

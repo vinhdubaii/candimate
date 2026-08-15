@@ -756,7 +756,12 @@ function toggleSettings() {
   settingsOpen = !settingsOpen;
   $('settings-popup').classList.toggle('open', settingsOpen);
   $('sb-settings').classList.toggle('active', settingsOpen);
-  if (settingsOpen) closeAllModals();
+  if (settingsOpen) {
+    closeAllModals();
+    revealSidebar(); // Settings mở ra thì sidebar PHẢI hiện, không ẩn/không bị đè
+  } else {
+    if (autoHideEnabled && !$('sidebar')?.matches(':hover')) scheduleHideSidebar();
+  }
 }
 function closeSettings() {
   settingsOpen = false;
@@ -770,7 +775,10 @@ function scrollToTop() {
 
 document.addEventListener('click', e => {
   const popup = $('settings-popup'), settBtn = $('sb-settings');
-  if (settingsOpen && !popup?.contains(e.target) && !settBtn?.contains(e.target)) closeSettings();
+  if (settingsOpen && !popup?.contains(e.target) && !settBtn?.contains(e.target)) {
+    closeSettings();
+    if (autoHideEnabled && !$('sidebar')?.matches(':hover')) scheduleHideSidebar();
+  }
 });
 
 /* ══════════════════════════════════════
@@ -790,17 +798,25 @@ function applyAutoHideState() {
   if (autoHideEnabled && !isMobile) {
     sb.classList.add('autohide');
     sb.classList.remove('revealed');
+    document.body.classList.add('autohide-collapsed');
   } else {
     sb.classList.remove('autohide', 'revealed');
+    document.body.classList.remove('autohide-collapsed');
   }
 }
 function revealSidebar() {
   $('sidebar')?.classList.add('revealed');
+  document.body.classList.remove('autohide-collapsed');
   clearTimeout(sidebarRevealTimer);
 }
 function scheduleHideSidebar() {
+  if (settingsOpen) return; // đang mở Settings thì không được ẩn
   clearTimeout(sidebarRevealTimer);
-  sidebarRevealTimer = setTimeout(() => { $('sidebar')?.classList.remove('revealed'); }, 400);
+  sidebarRevealTimer = setTimeout(() => {
+    if (settingsOpen) return;
+    $('sidebar')?.classList.remove('revealed');
+    if (autoHideEnabled) document.body.classList.add('autohide-collapsed');
+  }, 400);
 }
 $('sidebar-edge-trigger')?.addEventListener('mouseenter', () => { if (autoHideEnabled) revealSidebar(); });
 $('sidebar')?.addEventListener('mouseenter', () => { if (autoHideEnabled) revealSidebar(); });
