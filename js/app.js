@@ -661,15 +661,31 @@ $('sb-search-input')?.addEventListener('input', debounce(function() {
 /* ══════════════════════════════════════
    DÀNH CHO BẠN — layout justified: 2 ảnh dọc/hàng, ảnh ngang chiếm hết hàng
 ══════════════════════════════════════ */
-function buildSuggestions() {
+function getRatioPromise(url) {
+  return new Promise(resolve => getOrMeasureRatio(url, resolve));
+}
+
+let _suggestToken = 0;
+async function buildSuggestions() {
   const list = $('sb-suggest-list');
   if (!list) return;
-  const items = getAllPhotosFlat().sort(() => Math.random() - .5).slice(0, 10);
-  list.innerHTML = '';
+  const myToken = ++_suggestToken; // tránh 2 lần gọi chồng nhau ghi đè kết quả cũ
 
-  items.forEach(({ p, label, albumId, albumMeta }) => {
+  const items = getAllPhotosFlat().sort(() => Math.random() - .5).slice(0, 10);
+
+  // Đo tỉ lệ TẤT CẢ ảnh xong rồi mới dựng lưới — tránh Grid dense reflow chồng chéo
+  const withRatio = await Promise.all(items.map(async it => {
+    const { w, h } = await getRatioPromise(it.p.url);
+    return { ...it, w, h };
+  }));
+
+  if (myToken !== _suggestToken) return; // đã có lần gọi mới hơn (VD panel đóng/mở lại nhanh), bỏ kết quả cũ
+
+  list.innerHTML = '';
+  withRatio.forEach(({ p, label, albumId, albumMeta, w, h }) => {
     const item = document.createElement('div');
-    item.className = 'sb-suggest-item';
+    item.className = 'sb-suggest-item' + (w >= h ? ' wide' : '');
+    item.style.aspectRatio = `${w} / ${h}`;
     const img = document.createElement('img');
     img.src = p.url; img.loading = 'lazy';
     const caption = document.createElement('div');
@@ -686,13 +702,6 @@ function buildSuggestions() {
       currentIdx = photos.indexOf(p);
       openLb();
     });
-
-    /* Phân loại ngang/dọc dựa vào tỉ lệ thật đã đo (dùng lại arCache) */
-    getOrMeasureRatio(p.url, ({ w, h }) => {
-      item.style.aspectRatio = `${w} / ${h}`;
-      if (w >= h) item.classList.add('wide'); // ảnh ngang/vuông → chiếm hết 1 hàng
-    });
-
     list.appendChild(item);
   });
 }
