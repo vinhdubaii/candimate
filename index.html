@@ -11,12 +11,15 @@
 </head>
 <body>
 
+<!-- Vùng nhận hover để hiện lại sidebar khi auto-hide -->
+<div id="sidebar-edge-trigger"></div>
+
 <!-- SIDEBAR -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
 
   <!-- Logo = Home button (ẩn trên mobile qua CSS) -->
   <button class="sb-logo-btn" onclick="scrollToTop()" title="Candimate — Về đầu trang">
-    <img src="/Candimate-Preview__1_-removebg-preview.png" alt="Candimate"/>
+    <img id="sb-logo-img" src="/lightmode-icon.png" alt="Candimate"/>
   </button>
 
   <button class="sb-btn" id="sb-search" title="Tìm kiếm" onclick="toggleSbPanel()">
@@ -41,7 +44,7 @@
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>
   </button>
 
-  <button class="sb-btn" id="music-btn" title="Nhạc nền" onclick="toggleMusic()">
+  <button class="sb-btn" id="music-btn" title="Nhạc nền" onclick="toggleMusicPicker()">
     <svg id="icon-play" fill="currentColor" viewBox="0 0 24 24"><path d="M9 4l12 8-12 8V4z"/></svg>
     <svg id="icon-pause" fill="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
   </button>
@@ -52,9 +55,12 @@
 
 </aside>
 
-<!-- SETTINGS POPUP -->
+<!-- SETTINGS DRAWER (mép trái, full-height) -->
 <div class="settings-popup" id="settings-popup">
-  <div class="settings-title">Cài đặt</div>
+  <div class="settings-header">
+    <div class="settings-title" style="margin:0;">Cài đặt</div>
+    <button class="settings-close-btn" onclick="closeSettings()">✕</button>
+  </div>
 
   <div class="settings-row">
     <label for="dark-toggle">Dark mode</label>
@@ -68,6 +74,18 @@
     <label for="rightsb-toggle">Sidebar phải</label>
     <label class="toggle-switch"><input type="checkbox" id="rightsb-toggle" onchange="setSidebarRight(this.checked)"/><span class="toggle-track"></span></label>
   </div>
+  <div class="settings-row" id="autohide-row">
+    <label for="autohide-toggle">Tự động ẩn thanh bên</label>
+    <label class="toggle-switch"><input type="checkbox" id="autohide-toggle" onchange="setAutoHideSidebar(this.checked)"/><span class="toggle-track"></span></label>
+  </div>
+
+  <div class="settings-divider"></div>
+  <p class="settings-section-title">Ảnh nền</p>
+  <div class="wallpaper-grid" id="wallpaper-grid"></div>
+
+  <div class="settings-divider"></div>
+  <p class="settings-section-title">Albums</p>
+  <div id="settings-album-list"></div>
 
   <div class="settings-divider"></div>
   <a class="settings-about-link" href="https://candimate.pages.dev/policies" target="_blank" rel="noopener">
@@ -77,9 +95,19 @@
   </a>
 </div>
 
-<!-- MUSIC PICKER -->
-<div class="music-picker" id="music-picker">
-  <div class="music-picker-title">🎵 Chọn nhạc nền</div>
+<!-- MUSIC PICKER (Modal) -->
+<div class="music-picker center-modal" id="music-picker">
+  <div class="music-picker-inner">
+  <div class="ai-panel-header">
+    <span class="ai-panel-title">🎵 Chọn nhạc nền</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="ai-panel-close" id="music-playpause-btn" onclick="toggleMusic()" title="Phát/Dừng" style="width:32px;height:32px;">
+        <svg id="mp-icon-play" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M9 4l12 8-12 8V4z"/></svg>
+        <svg id="mp-icon-pause" width="14" height="14" fill="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      <button class="ai-panel-close" onclick="toggleMusicPicker()">✕</button>
+    </div>
+  </div>
   <div class="music-track active" id="track-0" onclick="selectTrack(0)">
     <div class="music-track-icon">🌤️</div>
     <div class="music-track-info"><div class="music-track-name">Trời Hửng Nắng</div><div class="music-track-artist">Uông Tô Lang</div></div>
@@ -103,22 +131,26 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="10" y1="10" x2="12" y2="8"/></svg>Lặp 1 bài
     </button>
   </div>
+  </div>
 </div>
 
-<!-- SEARCH PANEL -->
-<div class="sb-panel" id="sb-panel">
+<!-- OVERLAY DÙNG CHUNG cho Search / AI / Music -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeAllModals()"></div>
+
+<!-- SEARCH PANEL (Modal) -->
+<div class="sb-panel center-modal" id="sb-panel">
   <div class="sb-panel-inner">
-    <p class="sb-panel-label">Tìm kiếm</p>
+    <div class="ai-panel-header" style="padding:0 0 14px; margin-bottom:14px;">
+      <span class="ai-panel-title">Tìm kiếm</span>
+      <button class="ai-panel-close" onclick="toggleSbPanel()">✕</button>
+    </div>
     <div class="sb-search-box">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="sb-search-input" placeholder="Nhập tên ảnh..." autocomplete="off"/>
     </div>
     <div id="sb-suggestions" class="sb-suggestions">
       <p class="sb-suggest-label">Dành Cho Bạn</p>
-      <div class="sb-suggest-carousel" id="sb-suggest-carousel">
-        <div class="sb-suggest-track" id="sb-suggest-track"></div>
-      </div>
-      <div class="sb-suggest-dots" id="sb-suggest-dots"></div>
+      <div class="sb-suggest-list" id="sb-suggest-list"></div>
     </div>
     <div class="sb-search-results" id="sb-results" style="display:none"></div>
   </div>
@@ -169,8 +201,8 @@
   </div>
 </footer>
 
-<!-- AI PANEL (PC: trượt từ trái | Mobile: bottom sheet) -->
-<div class="ai-panel" id="ai-panel">
+<!-- AI PANEL (Modal) -->
+<div class="ai-panel center-modal" id="ai-panel">
   <div class="ai-drag-handle" id="ai-drag-handle"></div>
   <div class="ai-panel-inner">
     <div class="ai-panel-header">
@@ -193,7 +225,6 @@
     </div>
   </div>
 </div>
-<div class="ai-overlay" id="ai-overlay" onclick="toggleAiPanel()"></div>
 
 <audio id="bg-audio" loop></audio>
 <script src="js/app.js"></script>

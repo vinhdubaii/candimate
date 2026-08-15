@@ -31,9 +31,9 @@ body.dark {
   --text:    #e6edf3;
   --muted:   rgba(255,255,255,.45);
 
-  --glass-bg:      rgba(18,18,20,.78);
-  --glass-border:  rgba(255,255,255,.09);
-  --glass-blur:    blur(22px) saturate(1.5);
+  --glass-bg:      rgba(60,60,60,.55);
+  --glass-border:  rgba(255,255,255,.10);
+  --glass-blur:    blur(20px) saturate(1.2);
   --glass-shadow:  0 8px 32px rgba(0,0,0,.45);
 }
 
@@ -142,50 +142,53 @@ body.sidebar-right {
 }
 body.sidebar-right .sidebar { left: auto; right: var(--sb-gap); }
 body.sidebar-right .sb-btn.active::before { left: auto; right: 0; border-radius: 3px 0 0 3px; }
-body.sidebar-right .sb-panel { left: auto; right: calc(var(--sb-w) + var(--sb-gap) * 2 + 4px); }
-body.sidebar-right .settings-popup { left: auto; right: calc(var(--sb-w) + var(--sb-gap) + 8px); }
-body.sidebar-right .music-picker   { left: auto; right: calc(var(--sb-w) + var(--sb-gap) + 8px); }
-body.sidebar-right .ai-panel       { left: auto; right: calc(var(--sb-w) + var(--sb-gap) * 2 + 4px); }
 
 /* ═══════════════════════════════
-   FLOATING SEARCH PANEL
+   UNIFIED CENTER MODAL SYSTEM
+   (Search / AI / Music dùng chung)
 ═══════════════════════════════ */
-.sb-panel {
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 800;
+  background: rgba(0,0,0,.45);
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s ease;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+.center-modal {
   position: fixed;
-  top: var(--sb-gap);
-  left: calc(var(--sb-w) + var(--sb-gap) * 2 + 4px);
-  bottom: var(--sb-gap);
-  width: 0;
+  top: 50%; left: 50%;
+  width: min(640px, 92vw);
+  max-height: 78vh;
+  z-index: 801;
+  display: flex; flex-direction: column;
   overflow: hidden;
-  z-index: 499;
 
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid transparent;
+  border: 1px solid var(--glass-border);
   border-radius: var(--panel-r);
-  box-shadow: none;
-  opacity: 0;
-  pointer-events: none;
-
-  transition: width .3s cubic-bezier(.4,0,.2,1), opacity .2s, box-shadow .2s;
-  overscroll-behavior: contain;
-}
-.sb-panel.open {
-  width: 320px;
-  border-color: var(--glass-border);
   box-shadow: var(--glass-shadow);
-  opacity: 1;
-  pointer-events: auto;
+
+  opacity: 0; pointer-events: none;
+  transform: translate(-50%, -50%) scale(.95);
+  transition: opacity .22s ease, transform .22s cubic-bezier(.4,0,.2,1);
+}
+.center-modal.open {
+  opacity: 1; pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
 }
 
+/* ═══════════════════════════════
+   SEARCH MODAL — nội dung
+═══════════════════════════════ */
 .sb-panel-inner {
-  width: 320px; height: 100%;
+  width: 100%; height: 100%;
   display: flex; flex-direction: column;
-  padding: 18px 14px;
-  opacity: 0; transition: opacity .18s .1s;
+  padding: 22px 22px 16px;
+  overflow: hidden;
 }
-.sb-panel.open .sb-panel-inner { opacity: 1; }
 
 .sb-panel-label {
   font-size: 10px; font-weight: 700; letter-spacing: .12em;
@@ -215,65 +218,77 @@ body.dark .sb-search-box:focus-within { background: rgba(255,255,255,.1); }
 }
 .sb-search-box input::placeholder { color: var(--muted); }
 
-/* Results */
-.sb-search-results { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; overscroll-behavior: contain; }
+/* Results — dạng lưới */
+.sb-search-results {
+  flex: 1; overflow-y: auto; overscroll-behavior: contain;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  align-content: start;
+}
 .sb-search-results::-webkit-scrollbar { width: 3px; }
 .sb-search-results::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
 .sb-sr-item {
-  display: flex; align-items: center; gap: 12px; padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 6px; padding: 6px;
   border-radius: 12px; cursor: pointer;
   border: 1px solid transparent; transition: background .15s;
 }
 .sb-sr-item:hover { background: rgba(0,0,0,.04); border-color: var(--glass-border); }
 body.dark .sb-sr-item:hover { background: rgba(255,255,255,.07); }
-.sb-sr-item img { width: 90px; height: 90px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
-.sb-sr-name  { font-size: 14px; color: var(--text); font-weight: 600; }
-.sb-sr-album { font-size: 11px; color: var(--muted); margin-top: 3px; }
-.sb-sr-hint  { font-size: 12px; color: var(--muted); text-align: center; padding: 24px 0; line-height: 1.8; }
+.sb-sr-item img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 10px; }
+.sb-sr-name  { font-size: 12px; color: var(--text); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sb-sr-album { font-size: 10px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sb-sr-hint  { grid-column: 1 / -1; font-size: 12px; color: var(--muted); text-align: center; padding: 24px 0; line-height: 1.8; }
 
 /* ═══════════════════════════════
-   SUGGESTION CAROUSEL
+   DÀNH CHO BẠN — list 1 cột, ảnh lớn
 ═══════════════════════════════ */
-.sb-suggestions { margin-top: 2px; display: flex; flex-direction: column; }
+.sb-suggestions { margin-top: 2px; display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }
 .sb-suggest-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; flex-shrink: 0; }
-.sb-suggest-carousel { position: relative; overflow: hidden; border-radius: 14px; flex-shrink: 0; aspect-ratio: 1/1; width: 100%; touch-action: pan-x; }
-.sb-suggest-track { display: flex; height: 100%; width: 100%; flex-wrap: nowrap; transition: transform .35s cubic-bezier(.4,0,.2,1); will-change: transform; }
-.sb-suggest-slide { flex: 0 0 100%; max-width: 100%; height: 100%; min-width: 0; position: relative; cursor: pointer; overflow: hidden; }
-.sb-suggest-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.sb-suggest-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,.7)); padding: 28px 14px 14px; }
-.sb-suggest-album { font-size: 11px; color: rgba(255,255,255,.65); margin-bottom: 2px; }
-.sb-suggest-name  { font-size: 15px; font-weight: 600; color: #fff; }
-.sb-suggest-dots  { display: flex; justify-content: center; gap: 6px; padding: 10px 0 4px; flex-shrink: 0; }
-.sb-dot {
-  width: 6px; height: 6px; border-radius: 100px;
-  background: rgba(255,255,255,.35); opacity: 1;
-  transition: width .25s cubic-bezier(.2,0,0,1), background .25s;
-  cursor: pointer; flex-shrink: 0;
+.sb-suggest-list { flex: 1; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 12px; }
+.sb-suggest-list::-webkit-scrollbar { width: 3px; }
+.sb-suggest-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
+.sb-suggest-item {
+  position: relative; border-radius: 16px; overflow: hidden; cursor: pointer;
+  aspect-ratio: 16/9; flex-shrink: 0;
 }
-.sb-dot.active { width: 22px; background: var(--accent); }
+.sb-suggest-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s ease; }
+.sb-suggest-item:hover img { transform: scale(1.03); }
+.sb-suggest-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,.75)); padding: 32px 16px 14px; }
+.sb-suggest-album { font-size: 11px; color: rgba(255,255,255,.65); margin-bottom: 2px; }
+.sb-suggest-name  { font-size: 16px; font-weight: 600; color: #fff; }
 
 /* ═══════════════════════════════
-   SETTINGS POPUP — Glass
+   SETTINGS DRAWER — dính mép trái, full-height, KHÔNG animation
 ═══════════════════════════════ */
 .settings-popup {
   position: fixed;
-  left: calc(var(--sb-w) + var(--sb-gap) + 8px);
-  bottom: calc(var(--sb-gap) + 8px);
-  min-width: 220px;
-  padding: 16px 18px;
-  z-index: 600;
+  top: 0; left: 0; bottom: 0;
+  width: 340px;
+  padding: 22px 20px;
+  z-index: 900;
   display: none;
 
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--panel-r);
+  border-right: 1px solid var(--glass-border);
+  border-radius: 0;
   box-shadow: var(--glass-shadow);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-.settings-popup.open { display: block; animation: fadeUp .18s ease; }
+.settings-popup.open { display: block; } /* không animation, hiện tức thì */
+body.sidebar-right .settings-popup { left: auto; right: 0; border-right: none; border-left: 1px solid var(--glass-border); }
+
+.settings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.settings-close-btn {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.06); border: none; cursor: pointer;
+  color: var(--text); font-size: 15px; flex-shrink: 0;
+}
+body.dark .settings-close-btn { background: rgba(255,255,255,.08); }
+.settings-section-title { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 18px 0 10px; }
+.settings-section-title:first-of-type { margin-top: 0; }
 
 .settings-title { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
 .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
@@ -323,26 +338,94 @@ body.dark .settings-album-item:hover { background: rgba(255,255,255,.08); }
 .settings-album-count { font-size: 11px; color: var(--accent); margin-left: auto; }
 
 /* ═══════════════════════════════
-   MUSIC PICKER — Glass
+   WALLPAPER PICKER (trong Settings)
 ═══════════════════════════════ */
-.music-picker {
-  position: fixed; z-index: 700;
-  left: calc(var(--sb-w) + var(--sb-gap) + 8px);
-  bottom: calc(var(--sb-gap) + 60px);
-  width: 240px; padding: 14px;
-  display: none;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+.wallpaper-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.wallpaper-item {
+  position: relative; aspect-ratio: 4/3; border-radius: 10px; overflow: hidden;
+  cursor: pointer; border: 2px solid transparent; background: rgba(0,0,0,.15);
+}
+.wallpaper-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.wallpaper-item.active { border-color: var(--accent); }
+.wallpaper-item.active::after {
+  content: '✓'; position: absolute; top: 4px; right: 4px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+}
+.wallpaper-item.random-item { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 10px; text-align: center; padding: 4px; }
+.wallpaper-item.random-item svg { width: 20px; height: 20px; }
 
+/* ═══════════════════════════════
+   AUTO-HIDE SIDEBAR (desktop)
+═══════════════════════════════ */
+#sidebar-edge-trigger { position: fixed; top: 0; left: 0; bottom: 0; width: 14px; z-index: 498; }
+body.sidebar-right #sidebar-edge-trigger { left: auto; right: 0; }
+.sidebar.autohide { transition: transform .25s ease, opacity .25s ease; }
+.sidebar.autohide:not(.revealed) {
+  transform: translateX(calc(-100% - var(--sb-gap) - 8px));
+  opacity: 0; pointer-events: none;
+}
+body.sidebar-right .sidebar.autohide:not(.revealed) {
+  transform: translateX(calc(100% + var(--sb-gap) + 8px));
+}
+
+/* ═══════════════════════════════
+   TOP SEARCH BAR (trang chủ)
+═══════════════════════════════ */
+.top-searchbar-wrap { position: relative; max-width: 560px; margin: 28px auto 18px; padding: 0 16px; z-index: 50; }
+.top-searchbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 20px; border-radius: 999px;
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
-  border-radius: var(--panel-r);
   box-shadow: var(--glass-shadow);
 }
-.music-picker.open { display: block; animation: fadeUp .2s ease; }
-body.sidebar-right .music-picker { left: auto; right: calc(var(--sb-w) + var(--sb-gap) + 8px); }
+.top-searchbar svg { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
+.top-searchbar input {
+  flex: 1; background: none; border: none; outline: none;
+  color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif;
+}
+.top-searchbar input::placeholder { color: var(--muted); }
+.top-searchbar-dropdown {
+  position: absolute; top: calc(100% + 8px); left: 16px; right: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  box-shadow: var(--glass-shadow);
+  padding: 8px;
+  display: none;
+  max-height: 320px; overflow-y: auto;
+}
+.top-searchbar-dropdown.open { display: block; }
+.tsb-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+  border-radius: 10px; cursor: pointer; font-size: 13px; color: var(--text);
+  transition: background .12s;
+}
+.tsb-item:hover { background: rgba(0,0,0,.05); }
+body.dark .tsb-item:hover { background: rgba(255,255,255,.08); }
+.tsb-item svg { width: 13px; height: 13px; color: var(--muted); flex-shrink: 0; }
+.tsb-item .tsb-name { font-weight: 600; }
+.tsb-item .tsb-album { color: var(--muted); font-size: 11px; margin-left: auto; flex-shrink: 0; }
+.tsb-empty { padding: 16px; text-align: center; color: var(--muted); font-size: 12px; }
+
+/* ═══════════════════════════════
+   PHOTO SKELETON (chờ đo tỉ lệ ảnh)
+═══════════════════════════════ */
+.photo-card.skeleton { background: linear-gradient(100deg, rgba(255,255,255,.03) 30%, rgba(255,255,255,.09) 50%, rgba(255,255,255,.03) 70%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; aspect-ratio: 4/5; }
+.photo-card.skeleton img { opacity: 0; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* ═══════════════════════════════
+   MUSIC PICKER — Glass
+═══════════════════════════════ */
+/* Music Picker — dùng chung .center-modal, style nội dung */
+.music-picker-inner { padding: 20px; height: 100%; display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain; }
 
 .music-picker-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--glass-border); }
 .music-track {
@@ -414,7 +497,7 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
   animation: fadeIn .5s ease both;
 }
 .photo-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.45); }
-.photo-card img   { width: 100%; display: block; transition: transform .4s ease; }
+.photo-card img   { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
 .photo-card:hover img { transform: scale(1.04); }
 .photo-card .overlay {
   position: absolute; inset: 0;
@@ -641,50 +724,13 @@ body.dark .footer-projects-links a:hover {
    AI PANEL
 ═══════════════════════════════ */
 
-/* PC — panel trượt từ trái */
-/* ── AI Panel — mặc định: mobile bottom sheet ── */
-.ai-panel {
-  position: fixed;
-  top: var(--sb-gap);
-  left: calc(var(--sb-w) + var(--sb-gap) * 2 + 4px);
-  bottom: var(--sb-gap);
-  width: 0;
-  overflow: hidden;
-  z-index: 499;
+/* AI Panel — dùng chung .center-modal, chỉ style nội dung riêng */
+.ai-drag-handle { display: none; } /* ẩn trên PC, hiện lại ở mobile media query */
 
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid transparent;
-  border-radius: var(--panel-r);
-  box-shadow: none;
-  opacity: 0;
-  pointer-events: none;
-
-  transition: width .3s cubic-bezier(.4,0,.2,1), opacity .2s, box-shadow .2s;
-  overscroll-behavior: contain;
-}
-.ai-panel.open {
-  width: 340px;
-  border-color: var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Overlay — không cần trên PC */
-.ai-overlay { display: none; }
-
-/* Drag handle — ẩn trên PC */
-.ai-drag-handle { display: none; }
-
-/* Inner layout */
 .ai-panel-inner {
-  width: 340px; height: 100%;
+  width: 100%; height: 100%;
   display: flex; flex-direction: column;
-  opacity: 0; transition: opacity .18s .1s;
 }
-.ai-panel.open .ai-panel-inner { opacity: 1; }
 
 /* Header */
 .ai-panel-header {
@@ -853,19 +899,23 @@ body.dark .footer-projects-links a:hover {
   }
   #sb-upload svg { width: 22px; height: 22px; stroke-width: 1.6; }
 
-  /* Search panel — floating, slide up from bottom */
-  .sb-panel {
+  /* Search / AI / Music — bottom sheet gần full, đồng bộ 3 cái, có overlay tối */
+  .center-modal,
+  .sb-panel, .ai-panel, .music-picker {
     top: var(--sb-gap) !important;
     left: var(--sb-gap) !important;
     right: var(--sb-gap) !important;
     bottom: calc(54px + var(--sb-gap) * 2) !important;
     width: auto !important;
+    max-height: none !important;
     height: 0 !important;
+    transform: none !important;
     border-radius: var(--panel-r) !important;
     overflow: hidden;
-    transition: height .35s cubic-bezier(.4,0,.2,1) !important;
+    transition: height .3s cubic-bezier(.4,0,.2,1), opacity .2s !important;
   }
-  .sb-panel.open {
+  .center-modal.open,
+  .sb-panel.open, .ai-panel.open, .music-picker.open {
     height: calc(100vh - 54px - var(--sb-gap) * 3 - 4px) !important;
     border-color: var(--glass-border) !important;
     box-shadow: var(--glass-shadow) !important;
@@ -873,22 +923,30 @@ body.dark .footer-projects-links a:hover {
     pointer-events: auto !important;
   }
   .sb-panel-inner { width: 100% !important; }
+  .ai-panel-inner { width: 100% !important; }
 
-  /* Settings + music picker — above bottom bar, centered */
+  /* Settings drawer — mobile: bottom sheet gần full, giống 3 cái trên */
   .settings-popup {
-    left: var(--sb-gap) !important; right: var(--sb-gap) !important;
-    bottom: calc(54px + var(--sb-gap) * 2 + 4px) !important;
-    min-width: unset; max-width: 340px;
-    margin: 0 auto;
-    transform: none !important;
+    top: auto !important; left: var(--sb-gap) !important; right: var(--sb-gap) !important;
+    bottom: calc(54px + var(--sb-gap) * 2) !important;
+    width: auto !important; height: 0 !important;
+    border-radius: var(--panel-r) !important;
+    border-right: none !important; border-left: none !important;
+    overflow: hidden;
+    transition: height .3s cubic-bezier(.4,0,.2,1) !important;
   }
-  .music-picker {
-    left: var(--sb-gap) !important; right: var(--sb-gap) !important;
-    bottom: calc(54px + var(--sb-gap) * 2 + 4px) !important;
-    width: auto !important; max-width: 340px;
-    margin: 0 auto;
-    transform: none !important;
+  .settings-popup.open {
+    height: calc(100vh - 54px - var(--sb-gap) * 3 - 4px) !important;
+    overflow-y: auto !important;
   }
+
+  /* Auto-hide sidebar không áp dụng trên mobile */
+  .sidebar.autohide { transform: none !important; opacity: 1 !important; pointer-events: auto !important; }
+  #sidebar-edge-trigger { display: none !important; }
+  #autohide-row { display: none !important; } /* ẩn toggle trên mobile/tablet */
+
+  /* Top search bar mobile */
+  .top-searchbar-wrap { margin: 18px auto 12px; }
 
   #rightsb-row   { display: none; }
   .gallery       { padding: 8px 12px 24px; columns: 2 140px; }
@@ -910,26 +968,6 @@ body.dark .footer-projects-links a:hover {
   }
   .lb-bar { flex-wrap: wrap; gap: 8px; }
 
-  /* AI panel mobile — height 0 → height calc giống sb-panel */
-  .ai-panel {
-    top: var(--sb-gap) !important;
-    left: var(--sb-gap) !important;
-    right: var(--sb-gap) !important;
-    bottom: calc(54px + var(--sb-gap) * 2) !important;
-    width: auto !important;
-    height: 0 !important;
-    border-radius: var(--panel-r) !important;
-    overflow: hidden;
-    transition: height .35s cubic-bezier(.4,0,.2,1) !important;
-  }
-  .ai-panel.open {
-    height: calc(100vh - 54px - var(--sb-gap) * 3 - 4px) !important;
-    border-color: var(--glass-border) !important;
-    box-shadow: var(--glass-shadow) !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-  .ai-panel-inner { width: 100% !important; }
-
+  /* AI photo grid mobile */
   .ai-photo-grid { grid-template-columns: repeat(3, 1fr); }
 }

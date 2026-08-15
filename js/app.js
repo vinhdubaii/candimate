@@ -21,12 +21,47 @@ function albumFileToId(file) {
   return 'album-' + file.replace('.json', '').replace(/[^a-z0-9]/gi, '-').toLowerCase();
 }
 
-/* ── WALLPAPERS ── */
-const WALLPAPERS = ['/cap-1.jpg', '/cap2.jpg'];
-(function initWallpaper() {
-  const url = WALLPAPERS[Math.floor(Math.random() * WALLPAPERS.length)];
-  document.body.style.backgroundImage = `url('${url}')`;
-})();
+/* ── WALLPAPERS (đọc từ themes/manifest.json) ── */
+let WALLPAPERS = [];
+async function initWallpaper() {
+  try {
+    WALLPAPERS = await fetch(`${BASE_URL}/themes/manifest.json`).then(r => r.json());
+    if (!Array.isArray(WALLPAPERS)) WALLPAPERS = [];
+  } catch { WALLPAPERS = []; }
+  applyWallpaper();
+  buildWallpaperPicker();
+}
+function applyWallpaper() {
+  if (!WALLPAPERS.length) return; // chưa có ảnh nào trong themes/ — giữ nền mặc định CSS
+  const chosen = localStorage.getItem('wallpaperChoice'); // null/'' = random
+  let url;
+  if (chosen && WALLPAPERS.includes(chosen)) url = chosen;
+  else url = WALLPAPERS[Math.floor(Math.random() * WALLPAPERS.length)];
+  document.body.style.backgroundImage = `url('${BASE_URL}/themes/${url}')`;
+}
+function buildWallpaperPicker() {
+  const grid = $('wallpaper-grid'); if (!grid) return;
+  grid.innerHTML = '';
+  if (!WALLPAPERS.length) { grid.innerHTML = '<p style="font-size:11px;color:var(--muted);grid-column:1/-1;">Chưa có ảnh nền nào trong themes/</p>'; return; }
+  const chosen = localStorage.getItem('wallpaperChoice') || '';
+
+  const randomItem = document.createElement('div');
+  randomItem.className = 'wallpaper-item random-item' + (chosen === '' ? ' active' : '');
+  randomItem.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>Ngẫu nhiên';
+  randomItem.addEventListener('click', () => { localStorage.removeItem('wallpaperChoice'); applyWallpaper(); buildWallpaperPicker(); });
+  grid.appendChild(randomItem);
+
+  WALLPAPERS.forEach(file => {
+    const item = document.createElement('div');
+    item.className = 'wallpaper-item' + (chosen === file ? ' active' : '');
+    const img = document.createElement('img');
+    img.src = `${BASE_URL}/themes/${file}`; img.loading = 'lazy';
+    item.appendChild(img);
+    item.addEventListener('click', () => { localStorage.setItem('wallpaperChoice', file); applyWallpaper(); buildWallpaperPicker(); });
+    grid.appendChild(item);
+  });
+}
+initWallpaper();
 
 /* ── STATE ── */
 let YEARS       = [];    // e.g. ["2026"]
@@ -135,13 +170,35 @@ const cardObserver = new IntersectionObserver((entries, obs) => {
   });
 }, { rootMargin: '200px' });
 
+/* ── Đo tỉ lệ ảnh trước khi hiện, cache localStorage để tránh giật layout ── */
+const AR_CACHE_KEY = 'arCache';
+let arCache = {};
+try { arCache = JSON.parse(localStorage.getItem(AR_CACHE_KEY) || '{}'); } catch { arCache = {}; }
+let arCacheDirty = false;
+function saveArCacheDebounced() {
+  if (arCacheDirty) return;
+  arCacheDirty = true;
+  setTimeout(() => { try { localStorage.setItem(AR_CACHE_KEY, JSON.stringify(arCache)); } catch {} arCacheDirty = false; }, 400);
+}
+function getOrMeasureRatio(url, cb) {
+  if (arCache[url]) { cb(arCache[url]); return; }
+  const probe = new Image();
+  probe.onload = () => {
+    const w = probe.naturalWidth || 4, h = probe.naturalHeight || 5;
+    arCache[url] = { w, h };
+    saveArCacheDebounced();
+    cb(arCache[url]);
+  };
+  probe.onerror = () => cb({ w: 4, h: 5 }); // fallback tỉ lệ mặc định
+  probe.src = url;
+}
+
 function makeCard(p, i, onClickFn) {
   const card = document.createElement('div');
-  card.className = 'photo-card';
+  card.className = 'photo-card skeleton';
   card.style.animationDelay = `${Math.min(i * 0.04, 0.6)}s`;
   const eager = i < 12;
   const img = document.createElement('img');
-  if (eager) img.src = p.url; else img.dataset.src = p.url;
   img.alt = p.name;
   img.loading = 'lazy';
   const overlay = document.createElement('div');
@@ -153,7 +210,23 @@ function makeCard(p, i, onClickFn) {
   card.appendChild(img);
   card.appendChild(overlay);
   card.addEventListener('click', onClickFn);
-  if (!eager) cardObserver.observe(card);
+
+  function reveal() {
+    card.classList.remove('skeleton');
+    if (eager) img.src = p.url; else img.dataset.src = p.url;
+    if (!eager) cardObserver.observe(card);
+  }
+
+  const cached = arCache[p.url];
+  if (cached) {
+    card.style.aspectRatio = `${cached.w} / ${cached.h}`;
+    reveal();
+  } else {
+    getOrMeasureRatio(p.url, ({ w, h }) => {
+      card.style.aspectRatio = `${w} / ${h}`;
+      reveal();
+    });
+  }
   return card;
 }
 
@@ -187,7 +260,69 @@ function buildHomeGallery() {
     frag.appendChild(card);
   });
   gallery.appendChild(frag);
+  container.appendChild(buildTopSearchBar());
   container.appendChild(gallery);
+}
+
+/* ══════════════════════════════════════
+   TOP SEARCH BAR — trang chủ
+══════════════════════════════════════ */
+function buildTopSearchBar() {
+  const wrap = document.createElement('div');
+  wrap.className = 'top-searchbar-wrap';
+  wrap.innerHTML = `
+    <div class="top-searchbar">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="top-search-input" placeholder="Tìm ảnh theo tên..." autocomplete="off"/>
+    </div>
+    <div class="top-searchbar-dropdown" id="top-searchbar-dropdown"></div>`;
+
+  const input    = wrap.querySelector('#top-search-input');
+  const dropdown = wrap.querySelector('#top-searchbar-dropdown');
+
+  input.addEventListener('input', debounce(() => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) { dropdown.classList.remove('open'); dropdown.innerHTML = ''; return; }
+
+    const qNum = q.replace(/[^0-9]/g, '');
+    const hits = getAllPhotosFlat().filter(({ p }) => {
+      const name = p.name.toLowerCase();
+      if (name.includes(q)) return true;
+      if (qNum) {
+        const nameNum = name.replace(/[^0-9]/g, '');
+        if (nameNum && (parseInt(nameNum,10) === parseInt(qNum,10) || nameNum.includes(qNum))) return true;
+      }
+      return false;
+    }).slice(0, 8);
+
+    dropdown.innerHTML = '';
+    if (!hits.length) {
+      dropdown.innerHTML = '<div class="tsb-empty">Không tìm thấy 😔</div>';
+    } else {
+      hits.forEach(({ p, label, albumId, albumMeta }) => {
+        const row = document.createElement('div');
+        row.className = 'tsb-item';
+        row.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="tsb-name"></span><span class="tsb-album"></span>`;
+        row.querySelector('.tsb-name').textContent  = p.name;
+        row.querySelector('.tsb-album').textContent = label;
+        row.addEventListener('click', () => {
+          const photos = albumData[albumId] || [];
+          filtered   = photos.map(ph => ({ p: ph, albumId, albumMeta }));
+          currentIdx = photos.indexOf(p);
+          dropdown.classList.remove('open');
+          openLb();
+        });
+        dropdown.appendChild(row);
+      });
+    }
+    dropdown.classList.add('open');
+  }, 120));
+
+  document.addEventListener('click', e => {
+    if (!wrap.contains(e.target)) dropdown.classList.remove('open');
+  });
+
+  return wrap;
 }
 
 /* ══════════════════════════════════════
@@ -507,13 +642,11 @@ $('sb-search-input')?.addEventListener('input', debounce(function() {
     el.className = 'sb-sr-item';
     const img = document.createElement('img');
     img.src = p.url; img.alt = p.name; img.loading = 'lazy';
-    const info = document.createElement('div');
     const nameDiv = document.createElement('div');
     nameDiv.className = 'sb-sr-name'; nameDiv.textContent = p.name;
     const albumDiv = document.createElement('div');
     albumDiv.className = 'sb-sr-album'; albumDiv.textContent = label;
-    info.appendChild(nameDiv); info.appendChild(albumDiv);
-    el.appendChild(img); el.appendChild(info);
+    el.appendChild(img); el.appendChild(nameDiv); el.appendChild(albumDiv);
     el.addEventListener('click', () => {
       const photos = albumData[albumId] || [];
       filtered   = photos.map(ph => ({ p: ph, albumId, albumMeta }));
@@ -526,20 +659,17 @@ $('sb-search-input')?.addEventListener('input', debounce(function() {
 }, 100));
 
 /* ══════════════════════════════════════
-   SUGGESTION CAROUSEL
+   DÀNH CHO BẠN — list 1 cột, 10 ảnh lớn
 ══════════════════════════════════════ */
-let carouselIdx = 0, carouselItems = [];
-
 function buildSuggestions() {
-  const track = $('sb-suggest-track'), dotsEl = $('sb-suggest-dots');
-  if (!track) return;
-  carouselItems = getAllPhotosFlat().sort(() => Math.random() - .5).slice(0, 4);
-  carouselIdx   = 0;
-  track.innerHTML = '';
+  const list = $('sb-suggest-list');
+  if (!list) return;
+  const items = getAllPhotosFlat().sort(() => Math.random() - .5).slice(0, 10);
+  list.innerHTML = '';
 
-  carouselItems.forEach(({ p, label, albumId, albumMeta }) => {
-    const slide = document.createElement('div');
-    slide.className = 'sb-suggest-slide';
+  items.forEach(({ p, label, albumId, albumMeta }) => {
+    const item = document.createElement('div');
+    item.className = 'sb-suggest-item';
     const img = document.createElement('img');
     img.src = p.url; img.loading = 'lazy';
     const caption = document.createElement('div');
@@ -549,87 +679,89 @@ function buildSuggestions() {
     const nameEl = document.createElement('div');
     nameEl.className = 'sb-suggest-name'; nameEl.textContent = p.name;
     caption.appendChild(albumEl); caption.appendChild(nameEl);
-    slide.appendChild(img); slide.appendChild(caption);
-    slide.addEventListener('click', () => {
+    item.appendChild(img); item.appendChild(caption);
+    item.addEventListener('click', () => {
       const photos = albumData[albumId] || [];
       filtered   = photos.map(ph => ({ p: ph, albumId, albumMeta }));
       currentIdx = photos.indexOf(p);
       openLb();
     });
-    track.appendChild(slide);
+    list.appendChild(item);
   });
-
-  const fc = track.firstElementChild?.cloneNode(true);
-  const lc = track.lastElementChild?.cloneNode(true);
-  if (fc && lc) {
-    fc.setAttribute('data-clone','1'); lc.setAttribute('data-clone','1');
-    track.appendChild(fc); track.insertBefore(lc, track.firstElementChild);
-  }
-  dotsEl.innerHTML = '';
-  carouselItems.forEach((_, i) => {
-    const dot = document.createElement('div');
-    dot.className = 'sb-dot' + (i === 0 ? ' active' : '');
-    dot.addEventListener('click', () => goCarousel(i));
-    dotsEl.appendChild(dot);
-  });
-  goCarousel(0, true);
 }
-
-function goCarousel(idx, skipAnim) {
-  const n = carouselItems.length; if (!n) return;
-  carouselIdx = ((idx % n) + n) % n;
-  const track = $('sb-suggest-track'); if (!track) return;
-  const pos = carouselIdx + 1;
-  track.style.transition = skipAnim ? 'none' : 'transform .35s cubic-bezier(.4,0,.2,1)';
-  track.style.transform  = `translateX(-${pos * 100}%)`;
-  $$('.sb-dot').forEach((d, i) => d.classList.toggle('active', i === carouselIdx));
-  if (!skipAnim) {
-    track.addEventListener('transitionend', function snap() {
-      track.removeEventListener('transitionend', snap);
-      if (pos === n + 1) { track.style.transition = 'none'; track.style.transform = 'translateX(-100%)'; carouselIdx = 0; }
-      if (pos === 0)     { track.style.transition = 'none'; track.style.transform = `translateX(-${n * 100}%)`; carouselIdx = n - 1; }
-      $$('.sb-dot').forEach((d, i) => d.classList.toggle('active', i === carouselIdx));
-    });
-  } else {
-    requestAnimationFrame(() => { track.style.transition = 'transform .35s cubic-bezier(.4,0,.2,1)'; });
-  }
-}
-
-;(function initCarouselEvents() {
-  let sx = 0, sy = 0, dragging = false;
-  const car = () => $('sb-suggest-carousel');
-  document.addEventListener('touchstart', e => { if (!car()?.contains(e.target)) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; dragging = true; }, { passive: true });
-  document.addEventListener('touchmove',  e => { if (!dragging) return; const dx = Math.abs(e.touches[0].clientX-sx), dy = Math.abs(e.touches[0].clientY-sy); if (dx > dy && dx > 8) e.preventDefault(); }, { passive: false });
-  document.addEventListener('touchend',   e => { if (!dragging) return; dragging = false; const d = sx - e.changedTouches[0].clientX, dy = Math.abs(e.changedTouches[0].clientY-sy); if (Math.abs(d) > 30 && dy < 60) goCarousel(carouselIdx + (d > 0 ? 1 : -1)); }, { passive: true });
-  let msx = 0;
-  document.addEventListener('mousedown', e => { msx = car()?.contains(e.target) ? e.clientX : 0; });
-  document.addEventListener('mouseup',   e => { if (!msx) return; const d = msx - e.clientX; msx = 0; if (Math.abs(d) > 30) goCarousel(carouselIdx + (d > 0 ? 1 : -1)); });
-  let wc = false;
-  document.addEventListener('wheel', e => { if (!car()?.contains(e.target)) return; e.preventDefault(); if (wc) return; wc = true; goCarousel(carouselIdx + (e.deltaY > 0 || e.deltaX > 0 ? 1 : -1)); setTimeout(() => { wc = false; }, 400); }, { passive: false });
-})();
 
 /* ══════════════════════════════════════
-   SIDEBAR
+   UNIFIED MODAL SYSTEM — Search / AI / Music
 ══════════════════════════════════════ */
-let panelOpen = false, settingsOpen = false;
+let panelOpen = false, aiOpenState = false, musicPickerOpen = false, settingsOpen = false;
 
-function toggleSbPanel() {
-  panelOpen = !panelOpen;
-  $('sb-panel').classList.toggle('open', panelOpen);
-  $('sb-search').classList.toggle('active', panelOpen);
-  if (panelOpen) { if (window.innerWidth > 768) setTimeout(() => $('sb-search-input').focus(), 320); buildSuggestions(); }
-  closeSettings();
+function _setModal(id, btnId, open) {
+  $(id)?.classList.toggle('open', open);
+  $(btnId)?.classList.toggle('active', open);
 }
+function _anyModalOpen() { return panelOpen || aiOpenState || musicPickerOpen; }
+function _syncOverlay() { $('modal-overlay')?.classList.toggle('open', _anyModalOpen()); }
+
+function closeAllModals() {
+  if (panelOpen)       toggleSbPanel(true);
+  if (aiOpenState)      toggleAiPanel(true);
+  if (musicPickerOpen)  toggleMusicPicker(true);
+}
+
+function toggleSbPanel(forceClose) {
+  panelOpen = forceClose ? false : !panelOpen;
+  _setModal('sb-panel', 'sb-search', panelOpen);
+  if (panelOpen) {
+    if (aiOpenState)     { aiOpenState = false; _setModal('ai-panel', 'sb-ai', false); }
+    if (musicPickerOpen) { musicPickerOpen = false; _setModal('music-picker', 'music-btn', false); }
+    if (window.innerWidth > 768) setTimeout(() => $('sb-search-input')?.focus(), 260);
+    buildSuggestions();
+    closeSettings();
+  }
+  _syncOverlay();
+}
+
+function toggleAiPanel(forceClose) {
+  aiOpenState = forceClose ? false : !aiOpenState;
+  _setModal('ai-panel', 'sb-ai', aiOpenState);
+  if (aiOpenState) {
+    if (panelOpen)        { panelOpen = false; _setModal('sb-panel', 'sb-search', false); }
+    if (musicPickerOpen)  { musicPickerOpen = false; _setModal('music-picker', 'music-btn', false); }
+    closeSettings();
+    setTimeout(() => $('ai-input')?.focus(), 260);
+  }
+  _syncOverlay();
+}
+
+function toggleMusicPicker(forceClose) {
+  musicPickerOpen = forceClose ? false : !musicPickerOpen;
+  _setModal('music-picker', 'music-btn', musicPickerOpen);
+  if (musicPickerOpen) {
+    if (panelOpen)    { panelOpen = false; _setModal('sb-panel', 'sb-search', false); }
+    if (aiOpenState)  { aiOpenState = false; _setModal('ai-panel', 'sb-ai', false); }
+    closeSettings();
+    syncPickerUI();
+  }
+  _syncOverlay();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && _anyModalOpen()) closeAllModals();
+});
+
+/* ══════════════════════════════════════
+   SETTINGS DRAWER — mép trái, KHÔNG animation
+══════════════════════════════════════ */
 function toggleSettings() {
   settingsOpen = !settingsOpen;
   $('settings-popup').classList.toggle('open', settingsOpen);
   $('sb-settings').classList.toggle('active', settingsOpen);
-  if (settingsOpen && panelOpen) toggleSbPanel();
+  if (settingsOpen) closeAllModals();
 }
 function closeSettings() {
   settingsOpen = false;
-  $('settings-popup').classList.remove('open');
-  $('sb-settings').classList.remove('active');
+  $('settings-popup')?.classList.remove('open');
+  $('sb-settings')?.classList.remove('active');
 }
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -639,11 +771,45 @@ function scrollToTop() {
 document.addEventListener('click', e => {
   const popup = $('settings-popup'), settBtn = $('sb-settings');
   if (settingsOpen && !popup?.contains(e.target) && !settBtn?.contains(e.target)) closeSettings();
-  const panel = $('sb-panel'), srchBtn = $('sb-search');
-  if (panelOpen && window.innerWidth <= 768 && !panel?.contains(e.target) && !srchBtn?.contains(e.target)) {
-    panelOpen = false; panel.classList.remove('open'); srchBtn.classList.remove('active');
-  }
 });
+
+/* ══════════════════════════════════════
+   AUTO-HIDE SIDEBAR (desktop only)
+══════════════════════════════════════ */
+let autoHideEnabled = localStorage.getItem('autoHideSidebar') === 'on';
+let sidebarRevealTimer = null;
+
+function setAutoHideSidebar(enabled) {
+  autoHideEnabled = enabled;
+  localStorage.setItem('autoHideSidebar', enabled ? 'on' : 'off');
+  applyAutoHideState();
+}
+function applyAutoHideState() {
+  const sb = $('sidebar'); if (!sb) return;
+  const isMobile = window.innerWidth <= 768;
+  if (autoHideEnabled && !isMobile) {
+    sb.classList.add('autohide');
+    sb.classList.remove('revealed');
+  } else {
+    sb.classList.remove('autohide', 'revealed');
+  }
+}
+function revealSidebar() {
+  $('sidebar')?.classList.add('revealed');
+  clearTimeout(sidebarRevealTimer);
+}
+function scheduleHideSidebar() {
+  clearTimeout(sidebarRevealTimer);
+  sidebarRevealTimer = setTimeout(() => { $('sidebar')?.classList.remove('revealed'); }, 400);
+}
+$('sidebar-edge-trigger')?.addEventListener('mouseenter', () => { if (autoHideEnabled) revealSidebar(); });
+$('sidebar')?.addEventListener('mouseenter', () => { if (autoHideEnabled) revealSidebar(); });
+$('sidebar')?.addEventListener('mouseleave', () => { if (autoHideEnabled) scheduleHideSidebar(); });
+window.addEventListener('resize', debounce(applyAutoHideState, 200));
+(function initAutoHideToggleUI() {
+  const t = $('autohide-toggle'); if (t) t.checked = autoHideEnabled;
+  applyAutoHideState();
+})();
 
 /* ══════════════════════════════════════
    THEME & SETTINGS
@@ -652,6 +818,8 @@ function applyTheme(isDark) {
   document.body.classList.toggle('dark', isDark);
   const t = $('dark-toggle'); if (t) t.checked = isDark;
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  const logo = $('sb-logo-img');
+  if (logo) logo.src = isDark ? '/darkmode-icon.png' : '/lightmode-icon.png';
 }
 (function() { applyTheme(localStorage.getItem('theme') === 'dark'); })();
 
@@ -686,6 +854,9 @@ function loadTrack(idx, play) {
 function syncMusicUI() {
   const p = audio.paused; musicBtn.classList.toggle('playing', !p);
   $('icon-play').style.display = p ? '' : 'none'; $('icon-pause').style.display = p ? 'none' : '';
+  const mpp = $('mp-icon-play'), mpz = $('mp-icon-pause');
+  if (mpp) mpp.style.display = p ? '' : 'none';
+  if (mpz) mpz.style.display = p ? 'none' : '';
   syncPickerUI();
 }
 function syncPickerUI() {
@@ -712,34 +883,11 @@ function startOnFirst() {
 document.addEventListener('click', startOnFirst); document.addEventListener('touchstart', startOnFirst);
 audio.src = TRACKS[trackIdx].src; audio.loop = repeatMode === 'one'; syncPickerUI();
 
-let pickerOpen = false, lpTimer = null;
-function togglePicker(f) { pickerOpen = f !== undefined ? f : !pickerOpen; $('music-picker').classList.toggle('open', pickerOpen); if (pickerOpen) syncPickerUI(); }
-musicBtn.addEventListener('mouseenter', () => { if (window.innerWidth > 768) togglePicker(true); });
-musicBtn.addEventListener('mouseleave', () => { if (window.innerWidth > 768) setTimeout(() => { if (!$('music-picker').matches(':hover')) togglePicker(false); }, 150); });
-$('music-picker').addEventListener('mouseleave', () => { if (window.innerWidth > 768) togglePicker(false); });
-musicBtn.addEventListener('touchstart', () => { if (window.innerWidth <= 768) lpTimer = setTimeout(() => togglePicker(true), 600); }, { passive: true });
-musicBtn.addEventListener('touchend',  () => clearTimeout(lpTimer));
-musicBtn.addEventListener('touchmove', () => clearTimeout(lpTimer));
-document.addEventListener('click', e => { if (pickerOpen && !$('music-picker').contains(e.target) && !musicBtn.contains(e.target)) togglePicker(false); });
-
 /* ══════════════════════════════════════
-   AI PANEL
+   AI PANEL — biến trạng thái chat
 ══════════════════════════════════════ */
-let aiOpen    = false;
 let aiHistory = [];   // [{ role: 'user'|'bot', text }]
 let aiLoading = false;
-
-function toggleAiPanel() {
-  aiOpen = !aiOpen;
-  $('ai-panel')?.classList.toggle('open', aiOpen);
-  $('ai-overlay')?.classList.toggle('open', aiOpen);
-  $('sb-ai')?.classList.toggle('active', aiOpen);
-  if (aiOpen) {
-    closeSettings();
-    if (panelOpen) toggleSbPanel();
-    setTimeout(() => $('ai-input')?.focus(), 350);
-  }
-}
 
 /* ── Build metadata gửi lên Worker ── */
 function buildMetadata() {
@@ -896,10 +1044,7 @@ $('ai-input')?.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAiMessage(); }
 });
 
-/* ── Đóng khi nhấn Escape ── */
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && aiOpen) toggleAiPanel();
-});
+/* ── Đóng khi nhấn Escape: đã xử lý chung trong Unified Modal System ── */
 
 /* ── Mobile: kéo để đóng bottom sheet ── */
 ;(function initAiSwipe() {
