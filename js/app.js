@@ -659,7 +659,7 @@ $('sb-search-input')?.addEventListener('input', debounce(function() {
 }, 100));
 
 /* ══════════════════════════════════════
-   DÀNH CHO BẠN — list 1 cột, 10 ảnh lớn
+   DÀNH CHO BẠN — layout justified: 2 ảnh dọc/hàng, ảnh ngang chiếm hết hàng
 ══════════════════════════════════════ */
 function buildSuggestions() {
   const list = $('sb-suggest-list');
@@ -686,6 +686,13 @@ function buildSuggestions() {
       currentIdx = photos.indexOf(p);
       openLb();
     });
+
+    /* Phân loại ngang/dọc dựa vào tỉ lệ thật đã đo (dùng lại arCache) */
+    getOrMeasureRatio(p.url, ({ w, h }) => {
+      item.style.aspectRatio = `${w} / ${h}`;
+      if (w >= h) item.classList.add('wide'); // ảnh ngang/vuông → chiếm hết 1 hàng
+    });
+
     list.appendChild(item);
   });
 }
