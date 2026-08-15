@@ -1,0 +1,1017 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Candimate — Chính sách & Điều khoản</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d10;
+    --bg-sidebar: #111116;
+    --bg-surface: #17171d;
+    --bg-hover: #1e1e26;
+    --bg-active: #1f1f2e;
+    --accent: #e8a838;
+    --accent-dim: rgba(232,168,56,0.12);
+    --accent-border: rgba(232,168,56,0.3);
+    --text-primary: #eeeef0;
+    --text-secondary: #9898a8;
+    --text-muted: #5a5a6e;
+    --border: rgba(255,255,255,0.07);
+    --border-accent: rgba(232,168,56,0.25);
+    --red: #e05050;
+    --red-bg: rgba(224,80,80,0.12);
+    --link: #7fa8e8;
+    --sidebar-w: 260px;
+    --header-h: 54px;
+  }
+
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  /* HEADER */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--header-h);
+    background: rgba(13,13,16,0.92);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    display: flex; align-items: center; gap: 0;
+    padding: 0;
+  }
+
+  .header-brand {
+    width: var(--sidebar-w);
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 20px;
+    border-right: 1px solid var(--border);
+    height: 100%;
+    flex-shrink: 0;
+  }
+
+  .brand-logo {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, #e8a838 0%, #f0c060 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: #1a1008; flex-shrink: 0;
+  }
+
+  .brand-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 17px; color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+
+  .header-center {
+    flex: 1;
+    display: flex; align-items: center;
+    padding: 0 28px;
+  }
+
+  .header-title {
+    font-size: 14px; color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .header-right {
+    padding: 0 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .badge-version {
+    font-size: 11px; padding: 3px 8px; border-radius: 20px;
+    background: var(--accent-dim); color: var(--accent);
+    border: 1px solid var(--accent-border);
+    font-weight: 500; letter-spacing: 0.2px;
+  }
+
+  /* LAYOUT */
+  .layout {
+    display: flex;
+    padding-top: var(--header-h);
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  aside {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    position: fixed;
+    top: var(--header-h); bottom: 0; left: 0;
+    overflow-y: auto;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    padding: 16px 0 32px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  aside::-webkit-scrollbar { width: 4px; }
+  aside::-webkit-scrollbar-track { background: transparent; }
+  aside::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .sidebar-section {
+    margin-bottom: 4px;
+  }
+
+  .sidebar-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 1px;
+    color: var(--text-muted); text-transform: uppercase;
+    padding: 12px 20px 6px;
+    display: block;
+  }
+
+  .sidebar-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-size: 13.5px; color: var(--text-secondary);
+    font-weight: 400;
+    border-left: 2px solid transparent;
+    margin: 0; border-top: none; border-right: none; border-bottom: none;
+    background: none; width: 100%; text-align: left;
+    text-decoration: none;
+  }
+
+  .sidebar-link:hover {
+    background: var(--bg-hover); color: var(--text-primary);
+  }
+
+  .sidebar-link.active {
+    background: var(--bg-active);
+    color: var(--accent);
+    border-left-color: var(--accent);
+    font-weight: 500;
+  }
+
+  .sidebar-link .si {
+    width: 16px; height: 16px; opacity: 0.6; flex-shrink: 0;
+  }
+
+  .sidebar-link.active .si { opacity: 1; }
+
+  /* MAIN CONTENT */
+  main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-height: calc(100vh - var(--header-h));
+    padding: 0 0 80px;
+  }
+
+  .policy-content {
+    max-width: 820px;
+    padding: 40px 48px;
+  }
+
+  .policy-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+
+  .policy-tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--accent); background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    border-radius: 4px; padding: 3px 8px;
+    margin-bottom: 14px;
+  }
+
+  .policy-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px; font-weight: 600; color: var(--text-primary);
+    line-height: 1.3; margin-bottom: 10px;
+    letter-spacing: -0.5px;
+  }
+
+  .policy-meta {
+    font-size: 12.5px; color: var(--text-muted);
+    display: flex; gap: 16px; flex-wrap: wrap;
+  }
+
+  .policy-meta span { display: flex; align-items: center; gap: 5px; }
+
+  /* CONTENT BODY */
+  .content-body h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px; font-weight: 600; color: var(--text-primary);
+    margin: 36px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.3px;
+  }
+
+  .content-body h2:first-child { margin-top: 0; }
+
+  .content-body p {
+    color: var(--text-secondary); margin-bottom: 14px; line-height: 1.75;
+  }
+
+  .content-body ul {
+    list-style: none; margin: 8px 0 16px; padding: 0;
+  }
+
+  .content-body ul li {
+    color: var(--text-secondary);
+    padding: 4px 0 4px 20px;
+    position: relative; font-size: 14.5px; line-height: 1.65;
+  }
+
+  .content-body ul li::before {
+    content: '';
+    position: absolute; left: 0; top: 13px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); opacity: 0.5;
+  }
+
+  .content-body strong { color: var(--text-primary); font-weight: 600; }
+
+  .content-body .note-danger {
+    background: var(--red-bg);
+    border: 1px solid rgba(224,80,80,0.2);
+    border-left: 3px solid var(--red);
+    border-radius: 6px; padding: 14px 18px;
+    margin: 16px 0; display: flex; align-items: flex-start; gap: 12px;
+  }
+
+  .content-body .note-danger .icon { color: var(--red); font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .content-body .note-danger p { color: #f08888; margin: 0; font-size: 14px; }
+
+  .content-body .note-info {
+    background: rgba(127,168,232,0.08);
+    border: 1px solid rgba(127,168,232,0.2);
+    border-left: 3px solid var(--link);
+    border-radius: 6px; padding: 14px 18px;
+    margin: 16px 0;
+  }
+
+  .content-body .note-info p { color: #90b8e8; margin: 0; font-size: 14px; }
+
+  .content-body .note-warn {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px; padding: 14px 18px;
+    margin: 16px 0;
+  }
+
+  .content-body .note-warn p { color: #c8942a; margin: 0; font-size: 14px; }
+
+  .section-intro {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+  }
+
+  .section-intro p { color: var(--text-secondary); margin: 0; font-size: 14.5px; line-height: 1.75; }
+
+  /* FOOTER */
+  .content-footer {
+    margin-top: 48px; padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+
+  .content-footer .footer-note {
+    font-size: 12px; color: var(--text-muted);
+  }
+
+  .btn-contact {
+    font-size: 13px; padding: 8px 16px;
+    background: var(--accent-dim); color: var(--accent);
+    border: 1px solid var(--accent-border);
+    border-radius: 6px; cursor: pointer;
+    font-family: inherit; font-weight: 500;
+    transition: background 0.15s;
+    text-decoration: none; display: inline-block;
+  }
+
+  .btn-contact:hover { background: rgba(232,168,56,0.2); }
+
+  /* PAGE FOOTER */
+  .page-footer {
+    padding: 20px 48px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--text-muted);
+  }
+
+  .page-footer a { color: var(--accent); text-decoration: none; }
+
+  /* WELCOME STATE */
+  .welcome-screen {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: calc(100vh - var(--header-h) - 80px);
+    text-align: center; padding: 40px;
+  }
+
+  .welcome-icon {
+    width: 64px; height: 64px; border-radius: 16px;
+    background: var(--accent-dim); border: 1px solid var(--accent-border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin-bottom: 20px;
+  }
+
+  .welcome-screen h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 600; margin-bottom: 10px;
+    color: var(--text-primary);
+  }
+
+  .welcome-screen p { color: var(--text-muted); font-size: 14px; max-width: 360px; }
+
+  /* Number headings */
+  .num-heading {
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .num-heading .num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; color: var(--accent); font-weight: 600;
+    background: var(--accent-dim); border-radius: 4px;
+    padding: 1px 7px; flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .policy-content { padding: 24px 20px; }
+    aside { width: 220px; }
+    main { margin-left: 220px; }
+    .header-brand { width: 220px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <div class="brand-logo">C</div>
+    <span class="brand-name">Candimate</span>
+  </div>
+  <div class="header-center">
+    <span class="header-title">Chính sách & Điều khoản</span>
+  </div>
+  <div class="header-right">
+    <span class="badge-version">Cập nhật 01/05/2026</span>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Tổng quan</span>
+      <button class="sidebar-link active" onclick="showPolicy('home')">
+        <svg class="si" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6.5L8 2l6 4.5V14H2V6.5z"/></svg>
+        Trang chính sách
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">Chính sách</span>
+      <button class="sidebar-link" onclick="showPolicy('terms')">
+        <svg class="si" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="1" width="10" height="14" rx="1.5"/><path d="M6 5h4M6 8h4M6 11h2"/></svg>
+        Điều khoản Sử dụng
+      </button>
+      <button class="sidebar-link" onclick="showPolicy('privacy')">
+        <svg class="si" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.5L2 4v4c0 3.5 2.5 6 6 7 3.5-1 6-3.5 6-7V4L8 1.5z"/></svg>
+        Quyền Riêng tư
+      </button>
+      <button class="sidebar-link" onclick="showPolicy('security')">
+        <svg class="si" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="7" width="8" height="7" rx="1"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2"/></svg>
+        Bảo mật
+      </button>
+      <button class="sidebar-link" onclick="showPolicy('content')">
+        <svg class="si" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        Nội dung
+      </button>
+      <button class="sidebar-link" onclick="showPolicy('image')">
+        <svg class="si" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><circle cx="5.5" cy="7.5" r="1.5"/><path d="M1 12l4-3 3 3 2.5-3 4.5 4"/></svg>
+        Quyền Hình ảnh
+      </button>
+      <button class="sidebar-link" onclick="showPolicy('ai')">
+        <svg class="si" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.42 1.42M11.53 11.53l1.42 1.42M3.05 12.95l1.42-1.42M11.53 4.47l1.42-1.42"/></svg>
+        AI Assistant
+      </button>
+      <button class="sidebar-link" onclick="showPolicy('opensource')">
+        <svg class="si" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M5 8c0-1.66 1.34-3 3-3s3 1.34 3 3a3 3 0 01-1.5 2.6v3.4"/><path d="M7 14.05V10.6"/></svg>
+        Mã nguồn mở
+      </button>
+      <button class="sidebar-link" onclick="showPolicy('platforms')">
+        <svg class="si" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="9" rx="1"/><path d="M5 14h6M8 11v3"/></svg>
+        Nền tảng Hỗ trợ
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">Khác</span>
+      <button class="sidebar-link" onclick="showPolicy('contact')">
+        <svg class="si" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12v8a1 1 0 01-1 1H3a1 1 0 01-1-1V4z"/><path d="M2 4l6 5 6-5"/></svg>
+        Liên hệ
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <div id="content-area">
+      <!-- HOME -->
+      <div id="policy-home" class="policy-content" style="display:block">
+        <div class="welcome-screen">
+          <div class="welcome-icon">📋</div>
+          <h2>Chính sách Candimate</h2>
+          <p>Chọn một chính sách từ thanh bên trái để xem nội dung chi tiết. Được phát triển bởi Lidora Studio.</p>
+        </div>
+        <div class="page-footer">
+          <span>© 2026 Candimate · Lidora Studio. All rights reserved.</span>
+          <span>Được phát triển cho <a href="#">THPT Lộc Hiệp</a></span>
+        </div>
+      </div>
+
+      <!-- TERMS -->
+      <div id="policy-terms" class="policy-content" style="display:none">
+        <div class="policy-header">
+          <div class="policy-tag">Pháp lý</div>
+          <h1 class="policy-title">Điều khoản Sử dụng</h1>
+          <div class="policy-meta">
+            <span>📅 Cập nhật: 01/05/2026</span>
+            <span>🔒 Áp dụng cho: Candimate Platform &amp; Services</span>
+            <span>🏢 Phát triển bởi: Lidora Studio</span>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="section-intro">
+            <p>Chào mừng bạn đến với Candimate. Khi truy cập hoặc sử dụng nền tảng Candimate, bạn đồng ý tuân thủ các điều khoản được quy định dưới đây. Các điều khoản này nhằm đảm bảo môi trường sử dụng an toàn, ổn định và phù hợp với mục tiêu hoạt động của nền tảng.</p>
+          </div>
+          <h2><span class="num-heading"><span class="num">01</span>Mục đích sử dụng nền tảng</span></h2>
+          <p>Candimate được xây dựng nhằm phục vụ việc lưu trữ, trình diễn và hỗ trợ tìm kiếm hình ảnh liên quan đến các sự kiện, hoạt động học đường và kho lưu trữ hình ảnh của Trường THPT Lộc Hiệp.</p>
+          <p>Người dùng được phép truy cập và sử dụng Candimate cho mục đích cá nhân, học tập, tham khảo hoặc xem nội dung công khai phù hợp với định hướng của nền tảng.</p>
+          <h2><span class="num-heading"><span class="num">02</span>Chấp nhận điều khoản</span></h2>
+          <p>Bằng việc tiếp tục sử dụng Candimate, người dùng xác nhận rằng mình đã đọc, hiểu và đồng ý với các Điều khoản Sử dụng này.</p>
+          <div class="note-warn"><p>Nếu người dùng không đồng ý với bất kỳ điều khoản nào, vui lòng ngừng sử dụng nền tảng.</p></div>
+          <h2><span class="num-heading"><span class="num">03</span>Quyền và trách nhiệm của người dùng</span></h2>
+          <p><strong>Người dùng được phép:</strong></p>
+          <ul>
+            <li>Xem và tìm kiếm hình ảnh trên nền tảng</li>
+            <li>Sử dụng các tính năng được cung cấp công khai</li>
+            <li>Tải xuống nội dung được cho phép bởi Candimate</li>
+            <li>Sử dụng AI Assistant trong phạm vi hỗ trợ của hệ thống</li>
+          </ul>
+          <p><strong>Người dùng không được phép:</strong></p>
+          <ul>
+            <li>Sử dụng Candimate cho mục đích vi phạm pháp luật</li>
+            <li>Cố gắng truy cập trái phép vào hệ thống hoặc hạ tầng kỹ thuật</li>
+            <li>Spam, khai thác lỗ hổng hoặc gây ảnh hưởng đến hoạt động của nền tảng</li>
+            <li>Thu thập dữ liệu hàng loạt bằng công cụ tự động nếu không có sự cho phép</li>
+            <li>Sao chép, chỉnh sửa hoặc sử dụng nội dung của Candimate cho mục đích thương mại mà không được cho phép</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">04</span>Hình ảnh và nội dung</span></h2>
+          <p>Toàn bộ hình ảnh, giao diện, bố cục, nội dung hiển thị và tài nguyên liên quan trên Candimate có thể thuộc quyền quản lý của dự án, đơn vị liên quan hoặc các nguồn nội dung được cho phép.</p>
+          <p>Người dùng cần tôn trọng quyền hình ảnh, quyền riêng tư và các quy định liên quan khi chia sẻ hoặc sử dụng nội dung từ nền tảng. Việc tải xuống hình ảnh không đồng nghĩa với quyền sử dụng lại cho mục đích thương mại hoặc chỉnh sửa trái phép.</p>
+          <h2><span class="num-heading"><span class="num">05</span>AI Assistant</span></h2>
+          <p>Candimate có thể tích hợp hệ thống AI Assistant nhằm hỗ trợ người dùng tìm kiếm hình ảnh hoặc trả lời các câu hỏi liên quan đến sự kiện. Người dùng hiểu rằng:</p>
+          <ul>
+            <li>AI chỉ mang tính hỗ trợ và có thể đưa ra thông tin chưa hoàn toàn chính xác trong một số trường hợp</li>
+            <li>Candimate không đảm bảo mọi phản hồi AI luôn chính xác hoặc đầy đủ</li>
+            <li>Người dùng không nên gửi nội dung nhạy cảm, bí mật hoặc dữ liệu cá nhân quan trọng tới AI Assistant</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">06</span>Hiệu năng và tính khả dụng</span></h2>
+          <p>Candimate luôn cố gắng duy trì hệ thống hoạt động ổn định và tối ưu hiệu năng trên các nền tảng được hỗ trợ. Tuy nhiên, Candimate không đảm bảo dịch vụ luôn hoạt động liên tục, không lỗi hoặc không bị gián đoạn do các yếu tố như bảo trì hệ thống, lỗi kỹ thuật, sự cố từ bên thứ ba hoặc vấn đề kết nối mạng.</p>
+          <h2><span class="num-heading"><span class="num">07</span>Bên thứ ba</span></h2>
+          <p>Candimate sử dụng công nghệ và hạ tầng từ nhiều dịch vụ bên thứ ba nhằm cải thiện hiệu năng và bảo mật, bao gồm nhưng không giới hạn: <strong>Cloudflare</strong>, <strong>Google Gemini</strong>, <strong>Cloudinary</strong>. Việc sử dụng các dịch vụ này có thể chịu ảnh hưởng từ điều khoản hoặc chính sách riêng của từng bên.</p>
+          <h2><span class="num-heading"><span class="num">08</span>Thay đổi dịch vụ và điều khoản</span></h2>
+          <p>Candimate có quyền thay đổi, cập nhật hoặc tạm dừng một phần tính năng, nội dung hoặc điều khoản nhằm phù hợp với định hướng phát triển của nền tảng. Các thay đổi quan trọng có thể được thông báo thông qua website hoặc các kênh chính thức của Candimate.</p>
+          <h2><span class="num-heading"><span class="num">09</span>Giới hạn trách nhiệm</span></h2>
+          <div class="note-info"><p>Candimate được cung cấp trên nguyên tắc "as-is" (như hiện có). Candimate không chịu trách nhiệm đối với các thiệt hại trực tiếp hoặc gián tiếp phát sinh từ việc sử dụng nền tảng, bao gồm nhưng không giới hạn ở lỗi dữ liệu, gián đoạn truy cập hoặc sai lệch thông tin từ AI Assistant.</p></div>
+        </div>
+        <div class="content-footer">
+          <span class="footer-note">Có câu hỏi? Liên hệ Lidora Studio.</span>
+          <button class="btn-contact" onclick="showPolicy('contact')">Liên hệ →</button>
+        </div>
+        <div class="page-footer">
+          <span>© 2026 Candimate · Lidora Studio. All rights reserved.</span>
+          <span>Được phát triển cho <a href="#">THPT Lộc Hiệp</a></span>
+        </div>
+      </div>
+
+      <!-- PRIVACY -->
+      <div id="policy-privacy" class="policy-content" style="display:none">
+        <div class="policy-header">
+          <div class="policy-tag">Quyền riêng tư</div>
+          <h1 class="policy-title">Chính sách Quyền Riêng tư</h1>
+          <div class="policy-meta">
+            <span>📅 Cập nhật: 01/05/2026</span>
+            <span>🔒 Áp dụng cho: Candimate Platform &amp; Services</span>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="section-intro">
+            <p>Candimate tôn trọng quyền riêng tư của người dùng và cam kết bảo vệ dữ liệu trong quá trình sử dụng nền tảng. Chính sách này giải thích cách Candimate xử lý thông tin, sử dụng công nghệ bên thứ ba và bảo vệ trải nghiệm người dùng.</p>
+          </div>
+          <h2><span class="num-heading"><span class="num">01</span>Mục đích của Candimate</span></h2>
+          <p>Candimate được xây dựng với mục tiêu lưu trữ, trình diễn và hỗ trợ tìm kiếm hình ảnh liên quan đến các sự kiện, hoạt động học đường và kho lưu trữ hình ảnh của Trường THPT Lộc Hiệp. Nền tảng hạn chế tối đa việc thu thập dữ liệu không cần thiết.</p>
+          <h2><span class="num-heading"><span class="num">02</span>Dữ liệu được thu thập</span></h2>
+          <p>Candimate <strong>không yêu cầu người dùng đăng ký tài khoản</strong> và không chủ động thu thập các thông tin nhận dạng cá nhân như họ tên, địa chỉ, số điện thoại, mật khẩu hoặc thông tin tài chính.</p>
+          <p>Trong quá trình sử dụng, một số dữ liệu kỹ thuật cơ bản có thể được xử lý:</p>
+          <ul>
+            <li>Loại thiết bị và trình duyệt sử dụng</li>
+            <li>Thông tin kỹ thuật phục vụ tối ưu hiển thị</li>
+            <li>Nhật ký lỗi kỹ thuật (nếu phát sinh)</li>
+            <li>Dữ liệu yêu cầu gửi tới hệ thống AI hoặc máy chủ</li>
+          </ul>
+          <div class="note-info"><p>Các dữ liệu này chỉ được sử dụng nhằm cải thiện chất lượng dịch vụ và <strong>không</strong> được sử dụng cho mục đích quảng cáo hoặc theo dõi người dùng.</p></div>
+          <h2><span class="num-heading"><span class="num">03</span>Hệ thống AI Assistant</span></h2>
+          <p>Candimate có thể sử dụng công nghệ AI từ Google Gemini nhằm hỗ trợ tìm kiếm và trả lời câu hỏi. Khi người dùng gửi nội dung tới AI Assistant:</p>
+          <ul>
+            <li>Nội dung câu hỏi có thể được chuyển tới hệ thống xử lý AI để tạo phản hồi</li>
+            <li>API Key được bảo vệ phía máy chủ và không hiển thị công khai</li>
+            <li>Candimate không sử dụng dữ liệu AI để xây dựng hồ sơ cá nhân người dùng</li>
+          </ul>
+          <div class="note-warn"><p>Người dùng không nên chia sẻ thông tin cá nhân nhạy cảm khi sử dụng AI Assistant.</p></div>
+          <h2><span class="num-heading"><span class="num">04</span>Công nghệ bên thứ ba</span></h2>
+          <ul>
+            <li><strong>Cloudflare</strong> — phân phối nội dung, bảo mật kết nối và tăng tốc truy cập</li>
+            <li><strong>Google Gemini</strong> — hỗ trợ AI Assistant cho chức năng tìm kiếm</li>
+            <li><strong>Cloudinary</strong> — hỗ trợ tối ưu hóa và phân phối hình ảnh</li>
+          </ul>
+          <p>Các bên thứ ba này có thể áp dụng chính sách quyền riêng tư riêng của họ.</p>
+          <h2><span class="num-heading"><span class="num">05</span>Cookie &amp; Local Storage</span></h2>
+          <p>Candimate có thể sử dụng Local Storage nhằm ghi nhớ một số thiết lập cơ bản như trạng thái giao diện hoặc tối ưu trải nghiệm sử dụng. Candimate <strong>không</strong> sử dụng cookie quảng cáo, không theo dõi hành vi người dùng để bán dữ liệu hoặc phục vụ mục đích thương mại.</p>
+          <h2><span class="num-heading"><span class="num">06</span>Bảo mật dữ liệu</span></h2>
+          <ul>
+            <li>Kết nối HTTPS mặc định</li>
+            <li>Hạ tầng bảo mật từ Cloudflare</li>
+            <li>Ẩn API Key thông qua hệ thống trung gian máy chủ</li>
+            <li>Rate Limiting nhằm giảm nguy cơ spam hoặc lạm dụng hệ thống</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">07</span>Quyền của người dùng</span></h2>
+          <ul>
+            <li>Sử dụng Candimate mà không cần cung cấp thông tin cá nhân</li>
+            <li>Yêu cầu phản ánh hoặc góp ý về nội dung liên quan đến nền tảng</li>
+            <li>Yêu cầu xem xét hoặc gỡ bỏ nội dung hình ảnh trong các trường hợp phù hợp</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">08</span>Thay đổi chính sách</span></h2>
+          <p>Candimate có thể cập nhật Chính sách Quyền riêng tư theo thời gian. Mọi thay đổi quan trọng sẽ được công bố trên website hoặc các kênh chính thức của Candimate.</p>
+        </div>
+        <div class="content-footer">
+          <span class="footer-note">Có câu hỏi? Liên hệ Lidora Studio.</span>
+          <button class="btn-contact" onclick="showPolicy('contact')">Liên hệ →</button>
+        </div>
+        <div class="page-footer">
+          <span>© 2026 Candimate · Lidora Studio. All rights reserved.</span>
+          <span>Được phát triển cho <a href="#">THPT Lộc Hiệp</a></span>
+        </div>
+      </div>
+
+      <!-- SECURITY -->
+      <div id="policy-security" class="policy-content" style="display:none">
+        <div class="policy-header">
+          <div class="policy-tag">Bảo mật</div>
+          <h1 class="policy-title">Chính sách Bảo mật</h1>
+          <div class="policy-meta">
+            <span>📅 Cập nhật: 01/05/2026</span>
+            <span>🔒 Áp dụng cho: Candimate Platform &amp; Services</span>
+            <span>🏢 Phát triển bởi: Lidora Studio</span>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="section-intro">
+            <p>Candimate cam kết xây dựng một nền tảng lưu trữ và trình diễn hình ảnh học đường theo hướng an toàn, ổn định và tôn trọng quyền riêng tư. Chính sách này mô tả các biện pháp kỹ thuật, nguyên tắc vận hành và định hướng bảo vệ hệ thống.</p>
+          </div>
+          <h2><span class="num-heading"><span class="num">01</span>Mục tiêu bảo mật</span></h2>
+          <ul>
+            <li>Bảo vệ dữ liệu và trải nghiệm người dùng</li>
+            <li>Hạn chế rủi ro truy cập trái phép</li>
+            <li>Đảm bảo tính ổn định của nền tảng</li>
+            <li>Giảm thiểu nguy cơ lạm dụng hệ thống</li>
+            <li>Tăng cường quyền riêng tư và minh bạch trong vận hành</li>
+          </ul>
+          <p>Candimate ưu tiên kiến trúc nhẹ, tối giản và giảm thiểu các thành phần không cần thiết nhằm hạn chế bề mặt tấn công.</p>
+          <h2><span class="num-heading"><span class="num">02</span>Kết nối an toàn</span></h2>
+          <p>Candimate sử dụng kết nối <strong>HTTPS mặc định</strong> nhằm mã hóa dữ liệu truyền tải giữa người dùng và hệ thống. Điều này giúp giảm nguy cơ đánh chặn dữ liệu, tăng cường tính riêng tư khi truy cập và hạn chế nguy cơ giả mạo kết nối.</p>
+          <p>Candimate sử dụng hạ tầng bảo mật và phân phối nội dung từ <strong>Cloudflare</strong> nhằm cải thiện hiệu năng và tăng cường bảo vệ hệ thống.</p>
+          <h2><span class="num-heading"><span class="num">03</span>Bảo vệ hạ tầng và hệ thống</span></h2>
+          <ul>
+            <li>Hệ thống phân phối nội dung thông qua Edge Network</li>
+            <li>Rate Limiting nhằm hạn chế spam và lạm dụng API</li>
+            <li>Giới hạn số lượng yêu cầu trong một khoảng thời gian</li>
+            <li>Kiểm soát truy cập đối với một số dịch vụ nội bộ</li>
+            <li>Giảm thiểu bề mặt tấn công thông qua kiến trúc tối giản</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">04</span>Bảo mật AI Assistant</span></h2>
+          <ul>
+            <li>API Key được lưu phía máy chủ và không hiển thị công khai</li>
+            <li>Hệ thống trung gian được sử dụng nhằm hạn chế lộ khóa truy cập</li>
+            <li>Một số cơ chế xác thực và giới hạn truy cập có thể được áp dụng</li>
+            <li>Hệ thống có thể giới hạn tần suất yêu cầu nhằm giảm nguy cơ lạm dụng</li>
+          </ul>
+          <div class="note-warn"><p>Candimate không khuyến khích người dùng gửi dữ liệu cá nhân nhạy cảm tới AI Assistant.</p></div>
+          <h2><span class="num-heading"><span class="num">05</span>Dịch vụ bên thứ ba</span></h2>
+          <ul>
+            <li><strong>Cloudflare</strong> — phân phối nội dung và bảo mật</li>
+            <li><strong>Google Gemini</strong> — AI Assistant</li>
+            <li><strong>Cloudinary</strong> — xử lý và phân phối hình ảnh</li>
+          </ul>
+          <p>Các dịch vụ này có thể có chính sách bảo mật riêng và Candimate không kiểm soát toàn bộ hạ tầng vận hành của các bên thứ ba.</p>
+          <h2><span class="num-heading"><span class="num">06</span>Báo cáo lỗ hổng bảo mật</span></h2>
+          <p>Candimate khuyến khích tinh thần bảo mật có trách nhiệm và thiện chí. Nếu phát hiện lỗ hổng bảo mật, hành vi bất thường, rủi ro ảnh hưởng tới nền tảng hoặc vấn đề liên quan đến quyền riêng tư, người dùng có thể liên hệ với Candimate hoặc Lidora Studio để báo cáo.</p>
+          <div class="note-danger">
+            <span class="icon">⚠</span>
+            <p>Candimate không ủng hộ việc khai thác lỗ hổng gây ảnh hưởng đến hệ thống hoặc người dùng.</p>
+          </div>
+          <h2><span class="num-heading"><span class="num">07</span>Giới hạn bảo mật</span></h2>
+          <p>Mặc dù Candimate luôn cố gắng tăng cường bảo mật, không có hệ thống trực tuyến nào có thể đảm bảo an toàn tuyệt đối. Các yếu tố như sự cố hạ tầng mạng, lỗi từ dịch vụ bên thứ ba, hành vi tấn công mạng hoặc vấn đề thiết bị người dùng có thể ảnh hưởng đến trải nghiệm hoặc mức độ an toàn.</p>
+        </div>
+        <div class="content-footer">
+          <span class="footer-note">Phát hiện lỗ hổng? Báo cáo ngay cho Lidora Studio.</span>
+          <button class="btn-contact" onclick="showPolicy('contact')">Liên hệ →</button>
+        </div>
+        <div class="page-footer">
+          <span>© 2026 Candimate · Lidora Studio. All rights reserved.</span>
+          <span>Được phát triển cho <a href="#">THPT Lộc Hiệp</a></span>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div id="policy-content" class="policy-content" style="display:none">
+        <div class="policy-header">
+          <div class="policy-tag">Nội dung</div>
+          <h1 class="policy-title">Chính sách Nội dung</h1>
+          <div class="policy-meta">
+            <span>📅 Cập nhật: 01/05/2026</span>
+            <span>🔒 Áp dụng cho: Candimate Platform &amp; Services</span>
+            <span>🏢 Phát triển bởi: Lidora Studio</span>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="section-intro">
+            <p>Chính sách Nội dung này đảm bảo Candimate duy trì một môi trường lưu trữ và trình diễn hình ảnh học đường theo hướng tích cực, an toàn, phù hợp với môi trường giáo dục và tôn trọng cộng đồng người dùng.</p>
+          </div>
+          <h2><span class="num-heading"><span class="num">01</span>Mục tiêu nội dung</span></h2>
+          <ul>
+            <li>Lưu trữ hình ảnh học đường</li>
+            <li>Gìn giữ kỷ niệm sự kiện và hoạt động tập thể</li>
+            <li>Hỗ trợ tìm kiếm và truy cập nội dung nhanh chóng</li>
+            <li>Xây dựng thư viện hình ảnh phục vụ học sinh, giáo viên và cộng đồng liên quan</li>
+          </ul>
+          <div class="note-info"><p>Candimate không phải nền tảng mạng xã hội công khai hoặc nền tảng chia sẻ nội dung tự do.</p></div>
+          <h2><span class="num-heading"><span class="num">02</span>Nội dung được phép xuất hiện</span></h2>
+          <ul>
+            <li>Ảnh sự kiện trường học</li>
+            <li>Ảnh hoạt động ngoại khóa</li>
+            <li>Ảnh tập thể lớp hoặc hoạt động cộng đồng</li>
+            <li>Ảnh lễ hội, phong trào, hội thi hoặc chương trình giáo dục</li>
+            <li>Nội dung mang tính lưu niệm, học đường và cộng đồng</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">03</span>Nội dung không phù hợp</span></h2>
+          <p>Candimate có thể từ chối hiển thị, hạn chế hoặc gỡ bỏ các nội dung nếu phát hiện:</p>
+          <ul>
+            <li>Nội dung xúc phạm cá nhân hoặc tập thể</li>
+            <li>Nội dung gây ảnh hưởng tiêu cực tới môi trường học đường</li>
+            <li>Hình ảnh mang tính quấy rối, bắt nạt hoặc làm tổn hại danh dự người khác</li>
+            <li>Nội dung giả mạo, xuyên tạc hoặc gây hiểu lầm nghiêm trọng</li>
+            <li>Nội dung vi phạm quyền riêng tư hoặc quyền hình ảnh</li>
+            <li>Nội dung không phù hợp với môi trường giáo dục</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">04</span>Chỉnh sửa và gỡ bỏ nội dung</span></h2>
+          <ul>
+            <li>Chỉnh sửa mô tả hoặc metadata nhằm cải thiện khả năng tìm kiếm</li>
+            <li>Tạm ẩn nội dung trong quá trình xem xét</li>
+            <li>Gỡ bỏ nội dung bị báo cáo hợp lý</li>
+            <li>Điều chỉnh cách hiển thị nội dung nếu cần thiết</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">05</span>Nội dung AI Assistant</span></h2>
+          <ul>
+            <li>AI chỉ đóng vai trò hỗ trợ, nội dung phản hồi có thể chưa hoàn toàn chính xác</li>
+            <li>AI không thay thế nguồn thông tin chính thức</li>
+            <li>Candimate có thể giới hạn hoặc điều chỉnh phản hồi AI trong một số trường hợp</li>
+          </ul>
+          <div class="note-danger">
+            <span class="icon">⚠</span>
+            <p>Candimate không cho phép sử dụng AI Assistant nhằm mục đích gây rối, spam hoặc khai thác hệ thống trái phép.</p>
+          </div>
+          <h2><span class="num-heading"><span class="num">06</span>Báo cáo nội dung</span></h2>
+          <p>Người dùng có thể phản ánh nội dung nếu phát hiện hình ảnh không phù hợp, có dấu hiệu vi phạm quyền riêng tư, nội dung gây ảnh hưởng tiêu cực hoặc xuất hiện sai lệch thông tin đáng kể. Candimate sẽ xem xét báo cáo một cách thiện chí.</p>
+        </div>
+        <div class="content-footer">
+          <span class="footer-note">Có câu hỏi? Liên hệ Lidora Studio.</span>
+          <button class="btn-contact" onclick="showPolicy('contact')">Liên hệ →</button>
+        </div>
+        <div class="page-footer">
+          <span>© 2026 Candimate · Lidora Studio. All rights reserved.</span>
+          <span>Được phát triển cho <a href="#">THPT Lộc Hiệp</a></span>
+        </div>
+      </div>
+
+      <!-- IMAGE RIGHTS -->
+      <div id="policy-image" class="policy-content" style="display:none">
+        <div class="policy-header">
+          <div class="policy-tag">Quyền hình ảnh</div>
+          <h1 class="policy-title">Chính sách về Quyền Hình ảnh</h1>
+          <div class="policy-meta">
+            <span>📅 Cập nhật: 01/05/2026</span>
+            <span>🔒 Áp dụng cho: Candimate Platform &amp; Services</span>
+            <span>🏢 Phát triển bởi: Lidora Studio</span>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="section-intro">
+            <p>Candimate tôn trọng quyền hình ảnh, quyền riêng tư cá nhân và các nguyên tắc liên quan đến việc lưu trữ, hiển thị và chia sẻ nội dung hình ảnh. Chính sách này đảm bảo việc sử dụng nền tảng diễn ra minh bạch và bảo vệ quyền lợi của các cá nhân xuất hiện trong hình ảnh.</p>
+          </div>
+          <h2><span class="num-heading"><span class="num">01</span>Mục đích lưu trữ hình ảnh</span></h2>
+          <p>Candimate được xây dựng với mục tiêu lưu giữ và trình diễn các khoảnh khắc liên quan đến hoạt động học đường, sự kiện tập thể, chương trình ngoại khóa, lễ hội, hoạt động giáo dục và các nội dung liên quan đến Trường THPT Lộc Hiệp.</p>
+          <div class="note-info"><p>Candimate <strong>không</strong> được xây dựng nhằm mục đích khai thác thương mại hình ảnh cá nhân.</p></div>
+          <h2><span class="num-heading"><span class="num">02</span>Phạm vi hình ảnh được lưu trữ</span></h2>
+          <ul>
+            <li>Ảnh sự kiện trường học</li>
+            <li>Ảnh tập thể lớp hoặc hoạt động chung</li>
+            <li>Ảnh hoạt động ngoại khóa</li>
+            <li>Ảnh chương trình, lễ hội, phong trào hoặc các nội dung học đường liên quan</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">03</span>Quyền hình ảnh và sự đồng thuận</span></h2>
+          <p>Candimate hiểu rằng hình ảnh cá nhân là một yếu tố cần được tôn trọng. Đối với các nội dung được ghi nhận trong môi trường học đường hoặc sự kiện tập thể, việc xuất hiện trong hình ảnh có thể được xem là một phần của hoạt động cộng đồng được tổ chức công khai. Tuy nhiên, Candimate vẫn tôn trọng quyền riêng tư của cá nhân và sẵn sàng xem xét các yêu cầu phù hợp.</p>
+          <h2><span class="num-heading"><span class="num">04</span>Yêu cầu chỉnh sửa hoặc gỡ bỏ hình ảnh</span></h2>
+          <p>Nếu một cá nhân cảm thấy hình ảnh của mình:</p>
+          <ul>
+            <li>Gây ảnh hưởng đến quyền riêng tư</li>
+            <li>Không phù hợp để hiển thị công khai</li>
+            <li>Bị sử dụng ngoài mong muốn hợp lý</li>
+            <li>Hoặc có lý do cá nhân chính đáng</li>
+          </ul>
+          <p>Người dùng có thể gửi yêu cầu xem xét chỉnh sửa hoặc gỡ bỏ nội dung hình ảnh. Candimate sẽ xem xét từng trường hợp một cách thiện chí và hợp lý.</p>
+          <h2><span class="num-heading"><span class="num">05</span>Việc tải xuống và chia sẻ hình ảnh</span></h2>
+          <p>Người dùng khi tải xuống hình ảnh cần:</p>
+          <ul>
+            <li>Tôn trọng quyền riêng tư của người khác</li>
+            <li>Không chỉnh sửa hoặc sử dụng hình ảnh nhằm xúc phạm, gây tổn hại hoặc lan truyền nội dung sai mục đích</li>
+            <li>Không sử dụng hình ảnh cho mục đích thương mại khi chưa có sự cho phép phù hợp</li>
+          </ul>
+          <div class="note-warn"><p>Candimate không chịu trách nhiệm đối với việc sử dụng lại hình ảnh bởi bên thứ ba sau khi nội dung được tải xuống ngoài nền tảng.</p></div>
+          <h2><span class="num-heading"><span class="num">06</span>Nội dung không phù hợp</span></h2>
+          <p>Candimate có quyền từ chối hiển thị hoặc gỡ bỏ các nội dung hình ảnh nếu phát hiện nội dung gây ảnh hưởng tiêu cực, không phù hợp với môi trường giáo dục, có yếu tố xúc phạm hoặc vi phạm quyền cá nhân.</p>
+          <h2><span class="num-heading"><span class="num">07</span>Giới hạn trách nhiệm</span></h2>
+          <p>Mặc dù luôn cố gắng kiểm duyệt và xử lý hợp lý, Candimate không đảm bảo có thể phản hồi hoặc xử lý mọi trường hợp ngay lập tức và có thể cần thời gian để xem xét yêu cầu.</p>
+        </div>
+        <div class="content-footer">
+          <span class="footer-note">Yêu cầu gỡ bỏ hình ảnh? Liên hệ Lidora Studio.</span>
+          <button class="btn-contact" onclick="showPolicy('contact')">Liên hệ →</button>
+        </div>
+        <div class="page-footer">
+          <span>© 2026 Candimate · Lidora Studio. All rights reserved.</span>
+          <span>Được phát triển cho <a href="#">THPT Lộc Hiệp</a></span>
+        </div>
+      </div>
+
+      <!-- AI -->
+      <div id="policy-ai" class="policy-content" style="display:none">
+        <div class="policy-header">
+          <div class="policy-tag">AI Assistant</div>
+          <h1 class="policy-title">Chính sách AI Assistant</h1>
+          <div class="policy-meta">
+            <span>📅 Cập nhật: 01/05/2026</span>
+            <span>🔒 Áp dụng cho: Candimate AI Assistant</span>
+            <span>🏢 Phát triển bởi: Lidora Studio</span>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="section-intro">
+            <p>Chính sách này giải thích cách hệ thống AI trong Candimate hoạt động, phạm vi hỗ trợ, giới hạn trách nhiệm và các nguyên tắc liên quan đến trải nghiệm người dùng. Candimate tích hợp AI nhằm hỗ trợ tìm kiếm hình ảnh, truy cập thông tin sự kiện và cải thiện khả năng tương tác với nền tảng.</p>
+          </div>
+          <h2><span class="num-heading"><span class="num">01</span>Mục đích của AI Assistant</span></h2>
+          <p>AI Assistant trong Candimate được phát triển nhằm:</p>
+          <ul>
+            <li>Hỗ trợ tìm kiếm hình ảnh nhanh hơn</li>
+            <li>Hỗ trợ tìm kiếm sự kiện hoặc album liên quan</li>
+            <li>Trả lời các câu hỏi liên quan đến nội dung học đường trên nền tảng</li>
+            <li>Cải thiện khả năng truy cập kho lưu trữ hình ảnh</li>
+          </ul>
+          <div class="note-info"><p>AI Assistant không được xây dựng để thay thế nguồn thông tin chính thức hoặc đưa ra quyết định quan trọng thay cho người dùng.</p></div>
+          <h2><span class="num-heading"><span class="num">02</span>Công nghệ sử dụng</span></h2>
+          <p>Candimate có thể sử dụng công nghệ AI từ <strong>Google Gemini</strong>. Hệ thống AI được tích hợp thông qua hạ tầng trung gian nhằm bảo vệ API Key, kiểm soát truy cập hệ thống, giảm nguy cơ lạm dụng dịch vụ và tăng cường ổn định vận hành.</p>
+          <h2><span class="num-heading"><span class="num">03</span>Phạm vi hỗ trợ</span></h2>
+          <p><strong>AI Assistant hỗ trợ:</strong></p>
+          <ul>
+            <li>Tìm kiếm ảnh theo nội dung hoặc mô tả</li>
+            <li>Hỏi đáp liên quan đến sự kiện, album hoặc nội dung học đường</li>
+            <li>Hỗ trợ điều hướng thông tin trong Candimate</li>
+          </ul>
+          <p><strong>AI Assistant không hỗ trợ:</strong></p>
+          <ul>
+            <li>Tư vấn chuyên môn (y tế, pháp lý, tài chính, học thuật chuyên sâu)</li>
+            <li>Nội dung ngoài phạm vi hoạt động của Candimate</li>
+            <li>Các yêu cầu có mục đích gây rối, spam hoặc khai thác hệ thống</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">04</span>Giới hạn độ chính xác</span></h2>
+          <ul>
+            <li>Phản hồi AI có thể không hoàn toàn chính xác trong mọi trường hợp</li>
+            <li>Một số nội dung có thể bị thiếu hoặc hiểu sai ngữ cảnh</li>
+            <li>AI có thể đưa ra câu trả lời chưa đầy đủ hoặc chưa cập nhật</li>
+          </ul>
+          <div class="note-warn"><p>Người dùng nên xem phản hồi AI như một công cụ hỗ trợ thay vì nguồn xác nhận tuyệt đối.</p></div>
+          <h2><span class="num-heading"><span class="num">05</span>Quyền riêng tư và dữ liệu</span></h2>
+          <ul>
+            <li>Nội dung câu hỏi có thể được gửi tới hệ thống AI để xử lý phản hồi</li>
+            <li>API Key không được hiển thị công khai cho người dùng</li>
+            <li>Candimate không sử dụng dữ liệu trò chuyện để xây dựng hồ sơ cá nhân</li>
+          </ul>
+          <p>Người dùng không nên gửi: thông tin cá nhân nhạy cảm, mật khẩu hoặc dữ liệu riêng tư, nội dung bí mật hoặc thông tin quan trọng.</p>
+          <h2><span class="num-heading"><span class="num">06</span>Rate Limit và chống lạm dụng</span></h2>
+          <p>Nhằm bảo vệ tính ổn định của hệ thống, Candimate có thể áp dụng giới hạn số lượt yêu cầu trong một khoảng thời gian, tạm chặn truy cập bất thường và giới hạn nội dung có dấu hiệu spam hoặc khai thác hệ thống.</p>
+          <h2><span class="num-heading"><span class="num">07</span>Thay đổi hoặc tạm ngừng dịch vụ</span></h2>
+          <p>Candimate có quyền điều chỉnh cách hoạt động của AI Assistant, thay đổi mô hình AI sử dụng, tạm ngừng hoặc giới hạn tính năng nhằm bảo trì hoặc tối ưu hệ thống. Candimate không đảm bảo AI Assistant luôn hoạt động liên tục trong mọi thời điểm.</p>
+          <h2><span class="num-heading"><span class="num">08</span>Giới hạn trách nhiệm</span></h2>
+          <div class="note-danger">
+            <span class="icon">⚠</span>
+            <p>Candimate không chịu trách nhiệm đối với các quyết định, hành động hoặc hệ quả phát sinh từ việc người dùng phụ thuộc hoàn toàn vào phản hồi của AI Assistant. Người dùng tự chịu trách nhiệm khi sử dụng thông tin do AI cung cấp.</p>
+          </div>
+        </div>
+        <div class="content-footer">
+          <span class="footer-note">Có câu hỏi về AI Assistant? Liên hệ Lidora Studio.</span>
+          <button class="btn-contact" onclick="showPolicy('contact')">Liên hệ →</button>
+        </div>
+        <div class="page-footer">
+          <span>© 2026 Candimate · Lidora Studio. All rights reserved.</span>
+          <span>Được phát triển cho <a href="#">THPT Lộc Hiệp</a></span>
+        </div>
+      </div>
+
+      <!-- OPEN SOURCE -->
+      <div id="policy-opensource" class="policy-content" style="display:none">
+        <div class="policy-header">
+          <div class="policy-tag">Mã nguồn mở</div>
+          <h1 class="policy-title">Chính sách Mã nguồn mở</h1>
+          <div class="policy-meta">
+            <span>📅 Cập nhật: 01/05/2026</span>
+            <span>🔒 Áp dụng cho: Candimate Platform &amp; Services</span>
+            <span>🏢 Phát triển bởi: Lidora Studio</span>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="section-intro">
+            <p>Candimate được xây dựng với tinh thần học hỏi, chia sẻ tri thức và tôn trọng cộng đồng mã nguồn mở. Chính sách này mô tả định hướng của Candimate đối với phần mềm mã nguồn mở, việc công khai mã nguồn và các nguyên tắc liên quan đến công nghệ được sử dụng trong nền tảng.</p>
+          </div>
+          <h2><span class="num-heading"><span class="num">01</span>Triết lý mã nguồn mở</span></h2>
+          <p>Candimate được phát triển dựa trên cảm hứng từ cộng đồng mã nguồn mở, nơi tri thức công nghệ được chia sẻ nhằm thúc đẩy học tập, sáng tạo và đổi mới. Dự án tôn trọng các giá trị cốt lõi:</p>
+          <ul>
+            <li>Tính minh bạch</li>
+            <li>Khả năng học hỏi và tiếp cận công nghệ</li>
+            <li>Tinh thần chia sẻ kiến thức</li>
+            <li>Tối ưu hiệu năng và quyền kiểm soát hệ thống</li>
+            <li>Tôn trọng quyền riêng tư người dùng</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">02</span>Công nghệ mã nguồn mở được sử dụng</span></h2>
+          <ul>
+            <li><strong>Firefox</strong> — triết lý web mở và quyền riêng tư</li>
+            <li><strong>Rust</strong> — phát triển hệ thống hiệu năng cao và an toàn</li>
+            <li><strong>Tauri</strong> — ứng dụng desktop lightweight</li>
+            <li><strong>Linux Kernel</strong> — tư duy tối giản và tối ưu hệ thống</li>
+            <li>Các thư viện và công cụ frontend/open-source khác phù hợp với định hướng phát triển</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">03</span>Công khai mã nguồn</span></h2>
+          <p>Một số thành phần của Candimate có thể được công khai nhằm mục đích học tập, minh bạch kiến trúc dự án, chia sẻ kinh nghiệm phát triển và hỗ trợ cộng đồng. Tuy nhiên, không phải toàn bộ hệ thống đều được công khai.</p>
+          <p>Một số thành phần có thể được giữ riêng tư nhằm bảo vệ bảo mật hệ thống, hạn chế lạm dụng nền tảng và đảm bảo sự ổn định của dịch vụ.</p>
+          <h2><span class="num-heading"><span class="num">04</span>Giấy phép và quyền sử dụng</span></h2>
+          <p>Người dùng hoặc nhà phát triển khi sử dụng lại mã nguồn cần:</p>
+          <ul>
+            <li>Tôn trọng giấy phép được áp dụng</li>
+            <li>Không sử dụng nhằm gây hại hoặc lạm dụng nền tảng</li>
+            <li>Ghi nhận nguồn gốc khi cần thiết theo yêu cầu giấy phép</li>
+            <li>Không giả mạo hoặc trình bày sai lệch nguồn gốc dự án</li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">05</span>Đóng góp cộng đồng</span></h2>
+          <p>Candimate trân trọng tinh thần cộng đồng mã nguồn mở và hoan nghênh các góp ý, phản hồi hoặc ý tưởng cải thiện dự án. Tuy nhiên, việc tiếp nhận đóng góp mã nguồn phụ thuộc vào mục tiêu phát triển, tính ổn định hệ thống và mức độ phù hợp với định hướng của Candimate.</p>
+          <h2><span class="num-heading"><span class="num">06</span>Giới hạn trách nhiệm</span></h2>
+          <p>Candimate không đảm bảo mọi phần mã nguồn công khai luôn phù hợp với mọi môi trường sử dụng hoặc mục đích triển khai riêng. Người dùng tự chịu trách nhiệm khi sửa đổi, triển khai hoặc sử dụng lại mã nguồn ngoài phạm vi chính thức của Candimate.</p>
+        </div>
+        <div class="content-footer">
+          <span class="footer-note">Có câu hỏi về mã nguồn? Liên hệ Lidora Studio.</span>
+          <button class="btn-contact" onclick="showPolicy('contact')">Liên hệ →</button>
+        </div>
+        <div class="page-footer">
+          <span>© 2026 Candimate · Lidora Studio. All rights reserved.</span>
+          <span>Được phát triển cho <a href="#">THPT Lộc Hiệp</a></span>
+        </div>
+      </div>
+
+      <!-- PLATFORMS -->
+      <div id="policy-platforms" class="policy-content" style="display:none">
+        <div class="policy-header">
+          <div class="policy-tag">Nền tảng</div>
+          <h1 class="policy-title">Chính sách Nền tảng được Hỗ trợ</h1>
+          <div class="policy-meta">
+            <span>📅 Cập nhật: 01/05/2026</span>
+            <span>🔒 Áp dụng cho: Candimate Platform &amp; Services</span>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="section-intro">
+            <p>Chính sách này mô tả các thiết bị, hệ điều hành và môi trường sử dụng mà Candimate ưu tiên hỗ trợ nhằm đảm bảo hiệu năng, tính ổn định và trải nghiệm người dùng tốt nhất. Candimate được phát triển theo định hướng lightweight, tối ưu hiệu năng và phù hợp với phần lớn thiết bị phổ biến trong môi trường học đường.</p>
+          </div>
+          <h2><span class="num-heading"><span class="num">01</span>Nền tảng được hỗ trợ chính thức</span></h2>
+          <p>Candimate hiện tại tập trung tối ưu cho:</p>
+          <ul>
+            <li><strong>Windows Desktop</strong></li>
+            <li><strong>Android Phones</strong></li>
+            <li><strong>Android Tablets</strong></li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">02</span>Windows Desktop</span></h2>
+          <p>Trên Windows, Candimate có thể hoạt động thông qua website chính thức trên trình duyệt hoặc ứng dụng desktop. Candimate ưu tiên tối ưu: tốc độ tải nội dung, hiệu ứng giao diện nhẹ, tiêu thụ RAM thấp và trải nghiệm xem ảnh mượt mà.</p>
+          <h2><span class="num-heading"><span class="num">03</span>Android Phones &amp; Tablets</span></h2>
+          <p>Candimate có thể hoạt động thông qua:</p>
+          <ul>
+            <li>Website mobile tối ưu responsive</li>
+            <li>Progressive Web App (nếu khả dụng)</li>
+            <li>Ứng dụng Android chính thức (nếu được phát hành)</li>
+          </ul>
+          <p>Candimate ưu tiên giao diện tối ưu cảm ứng và hiệu năng ổn định trên nhiều dòng máy.</p>
+          <h2><span class="num-heading"><span class="num">04</span>Nền tảng không hỗ trợ chính thức</span></h2>
+          <p>Hiện tại Candimate không hỗ trợ chính thức đối với:</p>
+          <ul>
+            <li>macOS</li>
+            <li>iOS / iPadOS</li>
+            <li>Linux Desktop</li>
+            <li>Các nền tảng ít phổ biến khác</li>
+          </ul>
+          <div class="note-warn"><p>Một số thiết bị hoặc trình duyệt vẫn có thể truy cập được, tuy nhiên trải nghiệm có thể không giống với các nền tảng được hỗ trợ chính thức.</p></div>
+          <h2><span class="num-heading"><span class="num">05</span>Trình duyệt được khuyến nghị</span></h2>
+          <p>Để đảm bảo trải nghiệm tốt nhất, Candimate khuyến nghị sử dụng các trình duyệt hiện đại:</p>
+          <ul>
+            <li><strong>Firefox</strong></li>
+            <li><strong>Google Chrome</strong></li>
+            <li><strong>Microsoft Edge</strong></li>
+          </ul>
+          <h2><span class="num-heading"><span class="num">06</span>Hiệu năng và khả năng tương thích</span></h2>
+          <p>Hiệu năng thực tế có thể phụ thuộc vào thiết bị người dùng, trình duyệt sử dụng, kết nối mạng, cấu hình hệ thống và công nghệ hoặc hạn chế của nền tảng. Một số hiệu ứng giao diện hoặc tính năng nâng cao có thể thay đổi tùy theo khả năng thiết bị.</p>
+          <h2><span class="num-heading"><span class="num">07</span>Thay đổi phạm vi hỗ trợ</span></h2>
+          <p>Candimate có thể mở rộng hoặc thay đổi phạm vi nền tảng được hỗ trợ trong tương lai tùy theo nhu cầu người dùng, khả năng phát triển dự án và định hướng của Candimate. Việc bổ sung nền tảng mới không được đảm bảo và sẽ phụ thuộc vào nguồn lực phát triển của dự án.</p>
+        </div>
+        <div class="content-footer">
+          <span class="footer-note">Phản hồi về khả năng tương thích? Liên hệ Lidora Studio.</span>
+          <button class="btn-contact" onclick="showPolicy('contact')">Liên hệ →</button>
+        </div>
+        <div class="page-footer">
+          <span>© 2026 Candimate · Lidora Studio. All rights reserved.</span>
+          <span>Được phát triển cho <a href="#">THPT Lộc Hiệp</a></span>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div id="policy-contact" class="policy-content" style="display:none">
+        <div class="policy-header">
+          <div class="policy-tag">Liên hệ</div>
+          <h1 class="policy-title">Liên hệ &amp; Hỗ trợ</h1>
+          <div class="policy-meta">
+            <span>🏢 Phát triển bởi: Lidora Studio</span>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="section-intro">
+            <p>Nếu bạn có câu hỏi, góp ý hoặc yêu cầu liên quan đến bất kỳ chính sách nào của Candimate, hãy liên hệ với chúng tôi thông qua các kênh chính thức của dự án hoặc Lidora Studio.</p>
+          </div>
+          <h2><span class="num-heading"><span class="num">01</span>Kênh liên hệ chính thức</span></h2>
+          <p>Người dùng có thể liên hệ với Candimate hoặc Lidora Studio thông qua các kênh hỗ trợ chính thức của dự án để:</p>
+          <ul>
+            <li>Báo cáo lỗ hổng bảo mật</li>
+            <li>Yêu cầu chỉnh sửa hoặc gỡ bỏ hình ảnh</li>
+            <li>Phản ánh nội dung không phù hợp</li>
+            <li>Góp ý về chính sách hoặc tính năng</li>
+            <li>Câu hỏi về mã nguồn và giấy phép</li>
+          </ul>
+          <div class="note-info"><p>Candimate sẽ xem xét mọi yêu cầu và phản hồi một cách thiện chí, phù hợp với định hướng hoạt động của nền tảng.</p></div>
+          <h2><span class="num-heading"><span class="num">02</span>Phát triển bởi</span></h2>
+          <p><strong>Lidora Studio</strong> — Đơn vị phát triển Candimate. Candimate được xây dựng dành riêng cho Trường THPT Lộc Hiệp.</p>
+        </div>
+        <div class="page-footer">
+          <span>© 2026 Candimate · Lidora Studio. All rights reserved.</span>
+          <span>Được phát triển cho <a href="#">THPT Lộc Hiệp</a></span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+function showPolicy(id) {
+  document.querySelectorAll('.policy-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('policy-' + id);
+  if (target) target.style.display = 'block';
+  const btn = document.querySelector('[onclick="showPolicy(\'' + id + '\')"]');
+  if (btn) btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
