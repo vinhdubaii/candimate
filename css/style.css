@@ -18,7 +18,7 @@
   --glass-shadow:  0 4px 24px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.08);
 
   /* Layout */
-  --sb-w:      50px;
+  --sb-w:      54px;
   --sb-gap:    8px;
   --sb-r:      999px;  /* full pill */
   --panel-r:   20px;   /* panels stay rounded but not pill */
@@ -56,9 +56,11 @@ body {
 ═══════════════════════════════ */
 .sidebar {
   position: fixed;
-  top: var(--sb-gap);
+  top: 50%;
   left: var(--sb-gap);
-  bottom: var(--sb-gap);
+  transform: translateY(-50%);
+  height: fit-content;
+  max-height: calc(100vh - var(--sb-gap) * 2);
   width: var(--sb-w);
   z-index: 500;
 
@@ -67,6 +69,8 @@ body {
   align-items: center;
   padding: 10px 0;
   gap: 2px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
@@ -94,9 +98,9 @@ body {
 }
 .sb-logo-btn:hover { transform: scale(1.1); opacity: .85; }
 
-/* Icon buttons — bo tròn hoàn toàn, giống Opera */
+/* Icon buttons — bo tròn hoàn toàn, giống Opera, kích thước gần bằng logo */
 .sb-btn {
-  width: 38px; height: 38px;
+  width: 44px; height: 44px;
   border-radius: 50%; border: none;
   cursor: pointer; background: transparent;
   display: flex; align-items: center; justify-content: center;
@@ -105,7 +109,7 @@ body {
   position: relative;
   flex-shrink: 0;
 }
-.sb-btn svg { width: 17px; height: 17px; }
+.sb-btn svg { width: 23px; height: 23px; }
 .sb-btn:hover { color: var(--text); background: rgba(0,0,0,.06); }
 body.dark .sb-btn:hover { background: rgba(255,255,255,.08); }
 .sb-btn.active { color: var(--accent); background: rgba(26,143,160,.12); }
@@ -116,7 +120,7 @@ body.dark .sb-btn:hover { background: rgba(255,255,255,.08); }
   border-radius: 100px;
   background: var(--accent);
 }
-.sb-spacer { flex: 1; min-height: 8px; }
+.sb-spacer { height: 8px; flex: none; }
 
 /* Upload button special */
 .sb-upload-btn {
@@ -125,7 +129,7 @@ body.dark .sb-btn:hover { background: rgba(255,255,255,.08); }
 }
 .sb-upload-btn:hover { color: var(--text); background: rgba(0,0,0,.06); }
 body.dark .sb-upload-btn:hover { background: rgba(255,255,255,.08); }
-.sb-upload-btn svg { width: 18px; height: 18px; stroke-width: 1.8; }
+.sb-upload-btn svg { width: 23px; height: 23px; stroke-width: 1.7; }
 
 /* Music playing pulse */
 #music-btn.playing { color: var(--accent); }
@@ -245,14 +249,20 @@ body.dark .sb-sr-item:hover { background: rgba(255,255,255,.07); }
 ═══════════════════════════════ */
 .sb-suggestions { margin-top: 2px; display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }
 .sb-suggest-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; flex-shrink: 0; }
-.sb-suggest-list { flex: 1; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 12px; }
+.sb-suggest-list {
+  flex: 1; overflow-y: auto; overscroll-behavior: contain;
+  display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: dense;
+  align-items: start;
+  gap: 10px; align-content: start;
+}
 .sb-suggest-list::-webkit-scrollbar { width: 3px; }
 .sb-suggest-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
 .sb-suggest-item {
   position: relative; border-radius: 16px; overflow: hidden; cursor: pointer;
-  flex-shrink: 0; background: rgba(0,0,0,.15);
+  background: rgba(0,0,0,.15);
 }
-.sb-suggest-item img { width: 100%; height: auto; display: block; transition: transform .3s ease; }
+.sb-suggest-item.wide { grid-column: 1 / -1; } /* ảnh ngang chiếm hết hàng */
+.sb-suggest-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s ease; }
 .sb-suggest-item:hover img { transform: scale(1.02); }
 .sb-suggest-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,.75)); padding: 32px 16px 14px; }
 .sb-suggest-album { font-size: 11px; color: rgba(255,255,255,.65); margin-bottom: 2px; }
@@ -366,11 +376,11 @@ body.dark .settings-album-item:hover { background: rgba(255,255,255,.08); }
 body.sidebar-right #sidebar-edge-trigger { left: auto; right: 0; }
 .sidebar.autohide { transition: transform .25s ease, opacity .25s ease; }
 .sidebar.autohide:not(.revealed) {
-  transform: translateX(calc(-100% - var(--sb-gap) - 8px));
+  transform: translateY(-50%) translateX(calc(-100% - var(--sb-gap) - 8px));
   opacity: 0; pointer-events: none;
 }
 body.sidebar-right .sidebar.autohide:not(.revealed) {
-  transform: translateX(calc(100% + var(--sb-gap) + 8px));
+  transform: translateY(-50%) translateX(calc(100% + var(--sb-gap) + 8px));
 }
 /* Trả lại không gian cho nội dung khi sidebar auto-hide đang ẩn */
 body.autohide-collapsed { transition: padding .25s ease; padding-left: calc(var(--sb-gap) + 8px) !important; }
@@ -843,6 +853,8 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
     bottom: var(--sb-gap) !important;
     width: auto !important;
     height: 54px;
+    max-height: none !important;
+    transform: none !important;
     flex-direction: row !important;
     padding: 0 16px !important;
     gap: 0 !important;
