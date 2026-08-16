@@ -225,25 +225,26 @@ body.dark .sb-search-box:focus-within { background: rgba(255,255,255,.1); }
 }
 .sb-search-box input::placeholder { color: var(--muted); }
 
-/* Results — dạng lưới */
+/* Results — dạng lưới justified: đo tỉ lệ thật, nhóm hàng bằng flex (không cắt ảnh) */
 .sb-search-results {
   flex: 1; overflow-y: auto; overscroll-behavior: contain;
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-  align-content: start;
+  display: flex; flex-direction: column; gap: 10px;
 }
 .sb-search-results::-webkit-scrollbar { width: 3px; }
 .sb-search-results::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
+.sb-sr-row { display: flex; gap: 10px; align-items: flex-start; }
 .sb-sr-item {
   display: flex; flex-direction: column; gap: 6px; padding: 6px;
   border-radius: 12px; cursor: pointer;
   border: 1px solid transparent; transition: background .15s;
+  flex: 1 1 0; min-width: 0;
 }
 .sb-sr-item:hover { background: rgba(0,0,0,.04); border-color: var(--glass-border); }
 body.dark .sb-sr-item:hover { background: rgba(255,255,255,.07); }
-.sb-sr-item img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 10px; }
+.sb-sr-item img { width: 100%; object-fit: cover; border-radius: 10px; display: block; }
 .sb-sr-name  { font-size: 12px; color: var(--text); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sb-sr-album { font-size: 10px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sb-sr-hint  { grid-column: 1 / -1; font-size: 12px; color: var(--muted); text-align: center; padding: 24px 0; line-height: 1.8; }
+.sb-sr-hint  { font-size: 12px; color: var(--muted); text-align: center; padding: 24px 0; line-height: 1.8; }
 
 /* ═══════════════════════════════
    DÀNH CHO BẠN — list 1 cột, ảnh lớn
