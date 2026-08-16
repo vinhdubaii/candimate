@@ -9,13 +9,17 @@
   --accent:  #1a8fa0;
   --accent2: #0e7490;
   --text:    #1a2332;
-  --muted:   rgba(0,0,0,.42);
+  --muted:   rgba(0,0,0,.64);
 
   /* Glass recipe — LIGHT (Air style) */
   --glass-bg:      rgba(245,248,250,.82);
   --glass-border:  rgba(0,0,0,.08);
   --glass-blur:    blur(24px) saturate(1.8);
   --glass-shadow:  0 4px 24px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.08);
+
+  /* Sidebar active state — trắng đặc nổi bật hơn nền kính mờ, icon xám đen (giống Apple Notes) */
+  --sb-active-bg: rgba(255,255,255,.98);
+  --sb-active-fg: #2b2f36;
 
   /* Layout */
   --sb-w:      54px;
@@ -35,6 +39,10 @@ body.dark {
   --glass-border:  rgba(255,255,255,.10);
   --glass-blur:    blur(20px) saturate(1.2);
   --glass-shadow:  0 8px 32px rgba(0,0,0,.45);
+
+  /* Sidebar active state — đảo ngược: vòng đen/xám đậm, icon trắng, tương phản với nền tối */
+  --sb-active-bg: rgba(18,18,20,.9);
+  --sb-active-fg: #ffffff;
 }
 
 /* ── BASE ── */
@@ -70,6 +78,7 @@ body {
   padding: 10px 0;
   gap: 2px;
   overflow-y: auto;
+  overflow-x: hidden; /* chặn triệt để thanh cuộn ngang dù có lệch vài px */
   overscroll-behavior: contain;
 
   background: var(--glass-bg);
@@ -112,7 +121,7 @@ body {
 .sb-btn svg { width: 23px; height: 23px; }
 .sb-btn:hover { color: var(--text); background: rgba(0,0,0,.06); }
 body.dark .sb-btn:hover { background: rgba(255,255,255,.08); }
-.sb-btn.active { color: var(--accent); background: rgba(26,143,160,.12); }
+.sb-btn.active { color: var(--sb-active-fg); background: var(--sb-active-bg); }
 .sb-spacer { height: 8px; flex: none; }
 
 /* Upload button special */
