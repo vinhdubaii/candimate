@@ -251,17 +251,19 @@ body.dark .sb-sr-item:hover { background: rgba(255,255,255,.07); }
 .sb-suggest-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; flex-shrink: 0; }
 .sb-suggest-list {
   flex: 1; overflow-y: auto; overscroll-behavior: contain;
-  display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: dense;
-  align-items: start;
-  gap: 10px; align-content: start;
+  display: flex; flex-direction: column; gap: 10px;
 }
 .sb-suggest-list::-webkit-scrollbar { width: 3px; }
 .sb-suggest-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
+/* Mỗi hàng tự co giãn theo chiều cao nội dung của chính nó — tránh bug Grid
+   (span nhiều cột + aspect-ratio gây vòng phụ thuộc width/height, làm hàng
+   bị tính chiều cao sai và đè lên hàng kế bên). */
+.sb-suggest-row { display: flex; gap: 10px; align-items: flex-start; } /* giữ đúng aspect-ratio riêng từng ảnh, không bị stretch theo ảnh cao nhất */
 .sb-suggest-item {
   position: relative; border-radius: 16px; overflow: hidden; cursor: pointer;
   background: rgba(0,0,0,.15);
+  flex: 1 1 0; min-width: 0; /* 2 ảnh dọc chia đều hàng; 1 ảnh ngang chiếm trọn hàng vì đứng 1 mình */
 }
-.sb-suggest-item.wide { grid-column: 1 / -1; } /* ảnh ngang chiếm hết hàng */
 .sb-suggest-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s ease; }
 .sb-suggest-item:hover img { transform: scale(1.02); }
 .sb-suggest-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,.75)); padding: 32px 16px 14px; }
