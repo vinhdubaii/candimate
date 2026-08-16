@@ -41,7 +41,7 @@ body.dark {
   --glass-shadow:  0 8px 32px rgba(0,0,0,.45);
 
   /* Sidebar active state — đảo ngược: vòng đen/xám đậm, icon trắng, tương phản với nền tối */
-  --sb-active-bg: rgba(18,18,20,.9);
+  --sb-active-bg: rgba(74,74,78,.9);
   --sb-active-fg: #ffffff;
 }
 
