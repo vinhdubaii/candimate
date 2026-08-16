@@ -888,6 +888,7 @@ function scheduleHideSidebar() {
   }, 400);
 }
 $('sidebar-edge-trigger')?.addEventListener('mouseenter', () => { if (autoHideEnabled) revealSidebar(); });
+$('sidebar-edge-trigger')?.addEventListener('mouseleave', () => { if (autoHideEnabled) scheduleHideSidebar(); });
 $('sidebar')?.addEventListener('mouseenter', () => { if (autoHideEnabled) revealSidebar(); });
 $('sidebar')?.addEventListener('mouseleave', () => { if (autoHideEnabled) scheduleHideSidebar(); });
 window.addEventListener('resize', debounce(applyAutoHideState, 200));
