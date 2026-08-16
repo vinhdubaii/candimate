@@ -617,7 +617,8 @@ function getAllPhotosFlat() {
   });
 }
 
-$('sb-search-input')?.addEventListener('input', debounce(function() {
+let _searchToken = 0;
+$('sb-search-input')?.addEventListener('input', debounce(async function() {
   const q    = $('sb-search-input').value.trim().toLowerCase();
   const res  = $('sb-results'), sugg = $('sb-suggestions');
   if (!q) { res.style.display = 'none'; res.innerHTML = ''; sugg.style.display = 'flex'; return; }
@@ -635,25 +636,44 @@ $('sb-search-input')?.addEventListener('input', debounce(function() {
     return false;
   });
 
+  const myToken = ++_searchToken; // gõ nhanh -> bỏ kết quả của lần gọi cũ hơn
+
   if (!hits.length) { res.innerHTML = '<p class="sb-sr-hint">Không tìm thấy 😔</p>'; return; }
+
+  // Đo tỉ lệ TẤT CẢ ảnh xong rồi mới dựng lưới — giữ đúng tỉ lệ thật, không cắt ảnh
+  const withRatio = await Promise.all(hits.slice(0, 50).map(async it => {
+    const { w, h } = await getRatioPromise(it.p.url);
+    return { ...it, w, h };
+  }));
+
+  if (myToken !== _searchToken) return; // đã có lần gõ mới hơn, bỏ kết quả cũ
+
+  const rows = groupIntoRows(withRatio, 3); // 3 ảnh dọc/hàng, ảnh ngang chiếm trọn hàng
+
   const frag = document.createDocumentFragment();
-  hits.slice(0, 50).forEach(({ p, label, albumId, albumMeta }) => {
-    const el = document.createElement('div');
-    el.className = 'sb-sr-item';
-    const img = document.createElement('img');
-    img.src = p.url; img.alt = p.name; img.loading = 'lazy';
-    const nameDiv = document.createElement('div');
-    nameDiv.className = 'sb-sr-name'; nameDiv.textContent = p.name;
-    const albumDiv = document.createElement('div');
-    albumDiv.className = 'sb-sr-album'; albumDiv.textContent = label;
-    el.appendChild(img); el.appendChild(nameDiv); el.appendChild(albumDiv);
-    el.addEventListener('click', () => {
-      const photos = albumData[albumId] || [];
-      filtered   = photos.map(ph => ({ p: ph, albumId, albumMeta }));
-      currentIdx = photos.indexOf(p);
-      openLb();
+  rows.forEach(rowItems => {
+    const row = document.createElement('div');
+    row.className = 'sb-sr-row';
+    rowItems.forEach(({ p, label, albumId, albumMeta, w, h }) => {
+      const el = document.createElement('div');
+      el.className = 'sb-sr-item';
+      const img = document.createElement('img');
+      img.src = p.url; img.alt = p.name; img.loading = 'lazy';
+      img.style.aspectRatio = `${w} / ${h}`; // giữ chỗ đúng tỉ lệ thật trước khi ảnh load
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'sb-sr-name'; nameDiv.textContent = p.name;
+      const albumDiv = document.createElement('div');
+      albumDiv.className = 'sb-sr-album'; albumDiv.textContent = label;
+      el.appendChild(img); el.appendChild(nameDiv); el.appendChild(albumDiv);
+      el.addEventListener('click', () => {
+        const photos = albumData[albumId] || [];
+        filtered   = photos.map(ph => ({ p: ph, albumId, albumMeta }));
+        currentIdx = photos.indexOf(p);
+        openLb();
+      });
+      row.appendChild(el);
     });
-    frag.appendChild(el);
+    frag.appendChild(row);
   });
   res.innerHTML = ''; res.appendChild(frag);
 }, 100));
@@ -663,6 +683,25 @@ $('sb-search-input')?.addEventListener('input', debounce(function() {
 ══════════════════════════════════════ */
 function getRatioPromise(url) {
   return new Promise(resolve => getOrMeasureRatio(url, resolve));
+}
+
+/* Nhóm items thành từng hàng kiểu justified: ảnh ngang đứng riêng 1 hàng,
+   ảnh dọc gom liên tiếp tối đa `maxPerRow` ảnh/hàng (hàng cuối có thể ít hơn). */
+function groupIntoRows(items, maxPerRow) {
+  const rows = [];
+  let i = 0;
+  while (i < items.length) {
+    const cur = items[i];
+    if (cur.w >= cur.h) { rows.push([cur]); i++; continue; }
+    const group = [cur];
+    let j = i + 1;
+    while (group.length < maxPerRow && items[j] && items[j].w < items[j].h) {
+      group.push(items[j]); j++;
+    }
+    rows.push(group);
+    i = j;
+  }
+  return rows;
 }
 
 let _suggestToken = 0;
@@ -684,21 +723,7 @@ async function buildSuggestions() {
   // Nhóm items thành từng hàng: 2 ảnh dọc/hàng, ảnh ngang đứng riêng 1 hàng.
   // Làm bằng flex theo hàng (thay vì CSS Grid span-column) để mỗi hàng tự co
   // giãn đúng theo chiều cao thật của nó, không bị lệch/tràn sang hàng khác.
-  const rows = [];
-  for (let i = 0; i < withRatio.length; i++) {
-    const cur = withRatio[i];
-    if (cur.w >= cur.h) {
-      rows.push([cur]); // ảnh ngang: 1 hàng riêng
-      continue;
-    }
-    const next = withRatio[i + 1];
-    if (next && next.w < next.h) {
-      rows.push([cur, next]); // 2 ảnh dọc liền nhau: ghép chung 1 hàng
-      i++;
-    } else {
-      rows.push([cur]); // ảnh dọc lẻ cuối danh sách: đứng 1 mình
-    }
-  }
+  const rows = groupIntoRows(withRatio, 2);
 
   list.innerHTML = '';
   rows.forEach(rowItems => {
