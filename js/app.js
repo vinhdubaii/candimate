@@ -685,6 +685,7 @@ async function buildSuggestions() {
   withRatio.forEach(({ p, label, albumId, albumMeta, w, h }) => {
     const item = document.createElement('div');
     item.className = 'sb-suggest-item' + (w >= h ? ' wide' : '');
+    item.style.aspectRatio = `${w} / ${h}`; // giữ chỗ trước khi ảnh load, tránh grid chồng chéo
     const img = document.createElement('img');
     img.src = p.url; img.loading = 'lazy';
     const caption = document.createElement('div');
