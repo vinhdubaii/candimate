@@ -419,8 +419,10 @@ body.autohide-collapsed.sidebar-right { padding-left: calc(var(--sb-gap) + 8px) 
   box-shadow: var(--glass-shadow);
   padding: 8px;
   display: none;
-  max-height: 320px; overflow-y: auto;
+  max-height: 320px; overflow-y: auto; overflow-x: hidden;
 }
+.top-searchbar-dropdown::-webkit-scrollbar { width: 3px; }
+.top-searchbar-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
 .top-searchbar-dropdown.open { display: block; }
 .tsb-item {
   display: flex; align-items: center; gap: 10px; padding: 9px 12px;
@@ -430,6 +432,7 @@ body.autohide-collapsed.sidebar-right { padding-left: calc(var(--sb-gap) + 8px) 
 .tsb-item:hover { background: rgba(0,0,0,.05); }
 body.dark .tsb-item:hover { background: rgba(255,255,255,.08); }
 .tsb-item svg { width: 13px; height: 13px; color: var(--muted); flex-shrink: 0; }
+.tsb-item .tsb-thumb { width: 28px; height: 28px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
 .tsb-item .tsb-name { font-weight: 600; }
 .tsb-item .tsb-album { color: var(--muted); font-size: 11px; margin-left: auto; flex-shrink: 0; }
 .tsb-empty { padding: 16px; text-align: center; color: var(--muted); font-size: 12px; }
