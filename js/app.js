@@ -302,7 +302,9 @@ function buildTopSearchBar() {
       hits.forEach(({ p, label, albumId, albumMeta }) => {
         const row = document.createElement('div');
         row.className = 'tsb-item';
-        row.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="tsb-name"></span><span class="tsb-album"></span>`;
+        row.innerHTML = `<img class="tsb-thumb" alt=""><span class="tsb-name"></span><span class="tsb-album"></span>`;
+        const thumb = row.querySelector('.tsb-thumb');
+        thumb.src = p.url; thumb.loading = 'lazy';
         row.querySelector('.tsb-name').textContent  = p.name;
         row.querySelector('.tsb-album').textContent = label;
         row.addEventListener('click', () => {
