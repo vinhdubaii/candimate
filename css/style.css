@@ -266,7 +266,7 @@ body.dark .sb-sr-item:hover { background: rgba(255,255,255,.07); }
   background: rgba(0,0,0,.15);
   flex: 1 1 0; min-width: 0; /* 2 ảnh dọc chia đều hàng; 1 ảnh ngang chiếm trọn hàng vì đứng 1 mình */
 }
-.sb-suggest-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s ease; }
+.sb-suggest-item img { width: 100%; height: auto; display: block; transition: transform .3s ease; }
 .sb-suggest-item:hover img { transform: scale(1.02); }
 .sb-suggest-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,.75)); padding: 32px 16px 14px; }
 .sb-suggest-album { font-size: 11px; color: rgba(255,255,255,.65); margin-bottom: 2px; }
@@ -954,3 +954,34 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
   /* AI photo grid mobile */
   .ai-photo-grid { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ═══════════════════════════════
+   CHẾ ĐỘ TIẾT KIỆM HIỆU NĂNG
+═══════════════════════════════ */
+/* Bỏ ảnh nền, đổi sang màu phẳng */
+body.perf-saver { background-image: none !important; background-color: #eef1f0; }
+body.perf-saver.dark { background-color: #202226; }
+
+/* Bỏ blur — toàn bộ UI kính mờ (sidebar, settings, modal, top search bar)
+   dùng chung biến --glass-bg/--glass-blur nên chỉ cần override 2 biến này */
+body.perf-saver:not(.dark) { --glass-blur: none; --glass-bg: rgb(245, 248, 250); }
+body.perf-saver.dark       { --glass-blur: none; --glass-bg: rgb(48, 48, 52); }
+
+/* Tắt toàn bộ animation/transition trên toàn trang */
+body.perf-saver, body.perf-saver * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Tắt hẳn hiệu ứng hover phóng to ảnh (không chỉ tắt animation, mà tắt cả transform) */
+body.perf-saver .photo-card:hover { transform: none !important; box-shadow: none !important; }
+body.perf-saver .photo-card:hover img,
+body.perf-saver .sb-suggest-item:hover img,
+body.perf-saver .sb-sr-item:hover img,
+body.perf-saver .wallpaper-item:hover,
+body.perf-saver .sb-logo-btn:hover { transform: none !important; }
+
+/* Wallpaper picker bị vô hiệu hoá + báo mờ khi đang bật tiết kiệm */
+.wallpaper-picker-note { display: none; font-size: 11px; color: var(--muted); margin: -4px 0 10px; line-height: 1.5; }
+body.perf-saver .wallpaper-picker-note { display: block; }
+body.perf-saver .wallpaper-grid { opacity: .4; pointer-events: none; }
