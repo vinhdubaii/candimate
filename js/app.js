@@ -32,6 +32,7 @@ async function initWallpaper() {
   buildWallpaperPicker();
 }
 function applyWallpaper() {
+  if (localStorage.getItem('perfSaver') === 'on') return; // Tiết kiệm hiệu năng: không tải ảnh nền
   if (!WALLPAPERS.length) return; // chưa có ảnh nào trong themes/ — giữ nền mặc định CSS
   const chosen = localStorage.getItem('wallpaperChoice'); // null/'' = random
   let url;
@@ -736,7 +737,6 @@ async function buildSuggestions() {
     rowItems.forEach(({ p, label, albumId, albumMeta, w, h }) => {
       const item = document.createElement('div');
       item.className = 'sb-suggest-item';
-      item.style.aspectRatio = `${w} / ${h}`; // giữ chỗ trước khi ảnh load
       const img = document.createElement('img');
       img.src = p.url; img.loading = 'lazy';
       const caption = document.createElement('div');
@@ -895,6 +895,29 @@ window.addEventListener('resize', debounce(applyAutoHideState, 200));
 (function initAutoHideToggleUI() {
   const t = $('autohide-toggle'); if (t) t.checked = autoHideEnabled;
   applyAutoHideState();
+})();
+
+/* ══════════════════════════════════════
+   CHẾ ĐỘ TIẾT KIỆM HIỆU NĂNG
+══════════════════════════════════════ */
+function setPerfSaver(enabled) {
+  localStorage.setItem('perfSaver', enabled ? 'on' : 'off');
+  applyPerfSaverState();
+}
+function applyPerfSaverState() {
+  const enabled = localStorage.getItem('perfSaver') === 'on';
+  document.body.classList.toggle('perf-saver', enabled);
+  $('wallpaper-grid')?.classList.toggle('disabled', enabled);
+  if (enabled) {
+    document.body.style.backgroundImage = ''; // bỏ ảnh nền đang có, dùng màu phẳng CSS
+  } else {
+    applyWallpaper(); // bật lại thì tải/áp dụng lại ảnh nền như cũ
+  }
+}
+(function initPerfSaverToggleUI() {
+  const enabled = localStorage.getItem('perfSaver') === 'on';
+  const t = $('perfsaver-toggle'); if (t) t.checked = enabled;
+  applyPerfSaverState();
 })();
 
 /* ══════════════════════════════════════
