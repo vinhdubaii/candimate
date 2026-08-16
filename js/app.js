@@ -306,7 +306,7 @@ function buildTopSearchBar() {
         const thumb = row.querySelector('.tsb-thumb');
         thumb.src = p.url; thumb.loading = 'lazy';
         // Set trực tiếp qua inline style — không phụ thuộc CSS cache, luôn đảm bảo thumbnail nhỏ gọn
-        thumb.style.cssText = 'width:28px;height:28px;object-fit:cover;border-radius:6px;flex-shrink:0;display:block;';
+        thumb.style.cssText = 'width:52px;height:52px;object-fit:cover;border-radius:8px;flex-shrink:0;display:block;';
         row.querySelector('.tsb-name').textContent  = p.name;
         row.querySelector('.tsb-album').textContent = label;
         row.addEventListener('click', () => {
