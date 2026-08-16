@@ -78,9 +78,14 @@
     <label for="autohide-toggle">Tự động ẩn thanh bên</label>
     <label class="toggle-switch"><input type="checkbox" id="autohide-toggle" onchange="setAutoHideSidebar(this.checked)"/><span class="toggle-track"></span></label>
   </div>
+  <div class="settings-row" id="perfsaver-row">
+    <label for="perfsaver-toggle">Chế độ tiết kiệm hiệu năng</label>
+    <label class="toggle-switch"><input type="checkbox" id="perfsaver-toggle" onchange="setPerfSaver(this.checked)"/><span class="toggle-track"></span></label>
+  </div>
 
   <div class="settings-divider"></div>
   <p class="settings-section-title">Ảnh nền</p>
+  <p class="wallpaper-picker-note" id="wallpaper-note">Ảnh nền đang tắt do Chế độ tiết kiệm hiệu năng đang bật.</p>
   <div class="wallpaper-grid" id="wallpaper-grid"></div>
 
   <div class="settings-divider"></div>
