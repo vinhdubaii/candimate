@@ -681,28 +681,52 @@ async function buildSuggestions() {
 
   if (myToken !== _suggestToken) return; // đã có lần gọi mới hơn (VD panel đóng/mở lại nhanh), bỏ kết quả cũ
 
+  // Nhóm items thành từng hàng: 2 ảnh dọc/hàng, ảnh ngang đứng riêng 1 hàng.
+  // Làm bằng flex theo hàng (thay vì CSS Grid span-column) để mỗi hàng tự co
+  // giãn đúng theo chiều cao thật của nó, không bị lệch/tràn sang hàng khác.
+  const rows = [];
+  for (let i = 0; i < withRatio.length; i++) {
+    const cur = withRatio[i];
+    if (cur.w >= cur.h) {
+      rows.push([cur]); // ảnh ngang: 1 hàng riêng
+      continue;
+    }
+    const next = withRatio[i + 1];
+    if (next && next.w < next.h) {
+      rows.push([cur, next]); // 2 ảnh dọc liền nhau: ghép chung 1 hàng
+      i++;
+    } else {
+      rows.push([cur]); // ảnh dọc lẻ cuối danh sách: đứng 1 mình
+    }
+  }
+
   list.innerHTML = '';
-  withRatio.forEach(({ p, label, albumId, albumMeta, w, h }) => {
-    const item = document.createElement('div');
-    item.className = 'sb-suggest-item' + (w >= h ? ' wide' : '');
-    item.style.aspectRatio = `${w} / ${h}`; // giữ chỗ trước khi ảnh load, tránh grid chồng chéo
-    const img = document.createElement('img');
-    img.src = p.url; img.loading = 'lazy';
-    const caption = document.createElement('div');
-    caption.className = 'sb-suggest-caption';
-    const albumEl = document.createElement('div');
-    albumEl.className = 'sb-suggest-album'; albumEl.textContent = label;
-    const nameEl = document.createElement('div');
-    nameEl.className = 'sb-suggest-name'; nameEl.textContent = p.name;
-    caption.appendChild(albumEl); caption.appendChild(nameEl);
-    item.appendChild(img); item.appendChild(caption);
-    item.addEventListener('click', () => {
-      const photos = albumData[albumId] || [];
-      filtered   = photos.map(ph => ({ p: ph, albumId, albumMeta }));
-      currentIdx = photos.indexOf(p);
-      openLb();
+  rows.forEach(rowItems => {
+    const row = document.createElement('div');
+    row.className = 'sb-suggest-row';
+    rowItems.forEach(({ p, label, albumId, albumMeta, w, h }) => {
+      const item = document.createElement('div');
+      item.className = 'sb-suggest-item';
+      item.style.aspectRatio = `${w} / ${h}`; // giữ chỗ trước khi ảnh load
+      const img = document.createElement('img');
+      img.src = p.url; img.loading = 'lazy';
+      const caption = document.createElement('div');
+      caption.className = 'sb-suggest-caption';
+      const albumEl = document.createElement('div');
+      albumEl.className = 'sb-suggest-album'; albumEl.textContent = label;
+      const nameEl = document.createElement('div');
+      nameEl.className = 'sb-suggest-name'; nameEl.textContent = p.name;
+      caption.appendChild(albumEl); caption.appendChild(nameEl);
+      item.appendChild(img); item.appendChild(caption);
+      item.addEventListener('click', () => {
+        const photos = albumData[albumId] || [];
+        filtered   = photos.map(ph => ({ p: ph, albumId, albumMeta }));
+        currentIdx = photos.indexOf(p);
+        openLb();
+      });
+      row.appendChild(item);
     });
-    list.appendChild(item);
+    list.appendChild(row);
   });
 }
 
