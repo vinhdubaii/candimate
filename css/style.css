@@ -100,7 +100,7 @@ body {
 
 /* Icon buttons — bo tròn hoàn toàn, giống Opera, kích thước gần bằng logo */
 .sb-btn {
-  width: 44px; height: 44px;
+  width: 40px; height: 40px;
   border-radius: 50%; border: none;
   cursor: pointer; background: transparent;
   display: flex; align-items: center; justify-content: center;
@@ -113,13 +113,6 @@ body {
 .sb-btn:hover { color: var(--text); background: rgba(0,0,0,.06); }
 body.dark .sb-btn:hover { background: rgba(255,255,255,.08); }
 .sb-btn.active { color: var(--accent); background: rgba(26,143,160,.12); }
-.sb-btn.active::before {
-  content: ''; position: absolute;
-  left: 3px; top: 50%; transform: translateY(-50%);
-  width: 3px; height: 14px;
-  border-radius: 100px;
-  background: var(--accent);
-}
 .sb-spacer { height: 8px; flex: none; }
 
 /* Upload button special */
@@ -147,7 +140,6 @@ body.sidebar-right {
   padding-right: calc(var(--sb-w) + var(--sb-gap) * 2 + 8px);
 }
 body.sidebar-right .sidebar { left: auto; right: var(--sb-gap); }
-body.sidebar-right .sb-btn.active::before { left: auto; right: 3px; }
 
 /* ═══════════════════════════════
    UNIFIED CENTER MODAL SYSTEM
@@ -867,15 +859,6 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
   /* Hide logo on mobile */
   .sb-logo-btn { display: none !important; }
   .sb-spacer   { display: none; }
-
-  /* Active indicator: bottom dot */
-  .sb-btn.active::before {
-    left: 50% !important; right: auto !important;
-    top: auto !important; bottom: 4px !important;
-    transform: translateX(-50%) !important;
-    width: 16px !important; height: 3px !important;
-    border-radius: 3px 3px 0 0 !important;
-  }
 
   /* Upload btn on mobile — plain like others */
   #sb-upload {
