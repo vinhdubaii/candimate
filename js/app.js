@@ -1148,3 +1148,12 @@ function openFavoritesPage() {
   container.appendChild(frag);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+/* ══════════════════════════════════════
+   PWA — đăng ký Service Worker (điều kiện để trình duyệt hiện nút "Cài đặt")
+══════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
