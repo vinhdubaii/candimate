@@ -647,8 +647,9 @@ function toggleZoom() {
 
   img.addEventListener('touchstart', e => {
     if (e.touches.length !== 1) return;
+    e.preventDefault(); // Ngăn trình duyệt tạo mouse event ảo sau chạm → tránh double-toggle zoom
     onDown(e.touches[0].clientX, e.touches[0].clientY);
-  }, { passive: true });
+  }, { passive: false });
   img.addEventListener('touchmove', e => {
     if (!isPanning || e.touches.length !== 1) return;
     if (img.classList.contains('zoomed')) e.preventDefault(); // ngăn cuộn trang khi đang pan
@@ -670,6 +671,7 @@ $('lightbox')?.addEventListener('click', e => { if (e.target === $('lightbox')) 
   let sx = 0, sy = 0;
   lb.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
   lb.addEventListener('touchend', e => {
+    if ($('lb-img')?.classList.contains('zoomed')) return; // Đang zoom → vuốt là để xem góc ảnh, không đổi ảnh
     const dx = sx - e.changedTouches[0].clientX;
     const dy = Math.abs(e.changedTouches[0].clientY - sy);
     if (Math.abs(dx) > 40 && dy < 80) navLb(dx > 0 ? 1 : -1);
