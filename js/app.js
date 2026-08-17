@@ -524,6 +524,9 @@ function updateLb() {
   const { p, albumMeta } = item;
   const el = $('lb-img');
   el.classList.remove('zoomed');
+  $('lightbox')?.classList.remove('zoomed-active');
+  panX = 0; panY = 0;
+  el.style.transform = '';
 
   const zb = $('zoom-btn');
   if (zb) {
@@ -576,19 +579,83 @@ function renderInfoPopup(p, albumMeta) {
     </div>`;
 }
 
-/* ── ZOOM ── */
+/* ── ZOOM + PAN ── */
+const ZOOM_SCALE = 3;
+let panX = 0, panY = 0;
+
+function applyZoomTransform() {
+  const img = $('lb-img');
+  img.style.transform = img.classList.contains('zoomed')
+    ? `translate(${panX}px, ${panY}px) scale(${ZOOM_SCALE})`
+    : '';
+}
+
 function toggleZoom() {
   const img = $('lb-img'), btn = $('zoom-btn');
   const z = img.classList.toggle('zoomed');
+  $('lightbox')?.classList.toggle('zoomed-active', z);
+  panX = 0; panY = 0;
+  applyZoomTransform();
   btn.querySelector('svg').innerHTML = z
     ? '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><line x1="8" y1="11" x2="14" y2="11"/>'
     : '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>';
   btn.childNodes[btn.childNodes.length - 1].textContent = z ? ' Thu nhỏ' : ' Phóng to';
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  $('lb-img')?.addEventListener('click', e => { e.stopPropagation(); toggleZoom(); });
-});
+/* Kéo ảnh (pan) khi đang zoom — chuột và cảm ứng đều dùng chung logic này.
+   Nhấn nhẹ (không kéo) → toggle zoom; kéo đủ xa → pan xem góc khác, có giới hạn (clamp). */
+;(function initLbPan() {
+  const img = $('lb-img'); if (!img) return;
+  const DRAG_THRESHOLD = 6;
+  let isPanning = false, panMoved = false;
+  let startX = 0, startY = 0, startPanX = 0, startPanY = 0;
+
+  function getMaxPan() {
+    return {
+      maxX: (img.offsetWidth  * (ZOOM_SCALE - 1)) / 2,
+      maxY: (img.offsetHeight * (ZOOM_SCALE - 1)) / 2,
+    };
+  }
+  const clamp = (v, max) => Math.min(max, Math.max(-max, v));
+
+  function onDown(x, y) {
+    isPanning = true; panMoved = false;
+    startX = x; startY = y;
+    startPanX = panX; startPanY = panY;
+    if (img.classList.contains('zoomed')) img.classList.add('panning');
+  }
+  function onMove(x, y) {
+    if (!isPanning) return;
+    const dx = x - startX, dy = y - startY;
+    if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) panMoved = true;
+    if (!panMoved || !img.classList.contains('zoomed')) return;
+    const { maxX, maxY } = getMaxPan();
+    panX = clamp(startPanX + dx, maxX);
+    panY = clamp(startPanY + dy, maxY);
+    applyZoomTransform();
+  }
+  function onUp() {
+    if (!isPanning) return;
+    isPanning = false;
+    img.classList.remove('panning');
+    if (!panMoved) toggleZoom(); // click nhẹ → toggle zoom (cả 2 chiều: zoom in / thu nhỏ)
+  }
+
+  img.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); onDown(e.clientX, e.clientY); });
+  window.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+  window.addEventListener('mouseup', onUp);
+
+  img.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    onDown(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  img.addEventListener('touchmove', e => {
+    if (!isPanning || e.touches.length !== 1) return;
+    if (img.classList.contains('zoomed')) e.preventDefault(); // ngăn cuộn trang khi đang pan
+    onMove(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: false });
+  img.addEventListener('touchend', onUp);
+})();
 document.addEventListener('keydown', e => {
   if (!$('lightbox')?.classList.contains('active')) return;
   if (e.key === 'Escape')     closeLb();
