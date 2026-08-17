@@ -560,8 +560,10 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
   max-width: 92vw; max-height: 82vh; border-radius: 10px; object-fit: contain;
   box-shadow: 0 32px 80px rgba(0,0,0,.6); animation: zoomIn .25s ease;
   cursor: zoom-in; transform-origin: center; transition: transform .3s ease;
+  touch-action: none; user-select: none;
 }
-#lb-img.zoomed { cursor: zoom-out; transform: scale(2); }
+#lb-img.zoomed { cursor: grab; }
+#lb-img.zoomed.panning { cursor: grabbing; transition: none; }
 .lb-bar {
   display: flex; align-items: center; justify-content: space-between;
   width: 100%; max-width: 92vw; padding: 14px 0 0; gap: 12px;
@@ -597,6 +599,17 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
 .lb-nav:hover { background: var(--accent); border-color: var(--accent); }
 .lb-prev { left: -58px; }
 .lb-next { right: -58px; }
+
+/* Ẩn toàn bộ UI khi đang zoom ảnh trong Lightbox */
+#lightbox.zoomed-active .lb-bar,
+#lightbox.zoomed-active .lb-close,
+#lightbox.zoomed-active .lb-nav {
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s ease;
+}
+#lightbox .lb-bar, #lightbox .lb-close, #lightbox .lb-nav {
+  transition: opacity .25s ease;
+}
 
 
 /* ═══════════════════════════════
