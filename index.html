@@ -40,8 +40,8 @@
     <svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   </a>
 
-  <button class="sb-btn" id="sb-ai" title="Trợ lý AI" onclick="toggleAiPanel()">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>
+  <button class="sb-btn" id="sb-favorites" title="Yêu thích" onclick="openFavoritesPage()">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
   </button>
 
   <button class="sb-btn" id="music-btn" title="Nhạc nền" onclick="toggleMusicPicker()">
@@ -99,14 +99,14 @@
 <!-- MUSIC PICKER (Modal) -->
 <div class="music-picker center-modal" id="music-picker">
   <div class="music-picker-inner">
-  <div class="ai-panel-header">
-    <span class="ai-panel-title">🎵 Chọn nhạc nền</span>
+  <div class="modal-header">
+    <span class="modal-title">🎵 Chọn nhạc nền</span>
     <div style="display:flex;align-items:center;gap:8px;">
-      <button class="ai-panel-close" id="music-playpause-btn" onclick="toggleMusic()" title="Phát/Dừng" style="width:32px;height:32px;">
+      <button class="modal-close" id="music-playpause-btn" onclick="toggleMusic()" title="Phát/Dừng" style="width:32px;height:32px;">
         <svg id="mp-icon-play" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M9 4l12 8-12 8V4z"/></svg>
         <svg id="mp-icon-pause" width="14" height="14" fill="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
       </button>
-      <button class="ai-panel-close" onclick="toggleMusicPicker()">✕</button>
+      <button class="modal-close" onclick="toggleMusicPicker()">✕</button>
     </div>
   </div>
   <div class="music-track active" id="track-0" onclick="selectTrack(0)">
@@ -141,9 +141,9 @@
 <!-- SEARCH PANEL (Modal) -->
 <div class="sb-panel center-modal" id="sb-panel">
   <div class="sb-panel-inner">
-    <div class="ai-panel-header" style="padding:0 0 14px; margin-bottom:14px;">
-      <span class="ai-panel-title">Tìm kiếm</span>
-      <button class="ai-panel-close" onclick="toggleSbPanel()">✕</button>
+    <div class="modal-header" style="padding:0 0 14px; margin-bottom:14px;">
+      <span class="modal-title">Tìm kiếm</span>
+      <button class="modal-close" onclick="toggleSbPanel()">✕</button>
     </div>
     <div class="sb-search-box">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -180,36 +180,14 @@
     <button class="lb-zoom-btn" id="zoom-btn" onclick="toggleZoom()">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg> Phóng to
     </button>
+    <button class="lb-btn" id="lb-fav-btn" onclick="toggleFavoriteCurrentPhoto()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Yêu thích
+    </button>
     <a id="lb-download" href="#" download>
       <button class="lb-btn">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Tải ảnh
       </button>
     </a>
-  </div>
-</div>
-
-<!-- AI PANEL (Modal) -->
-<div class="ai-panel center-modal" id="ai-panel">
-  <div class="ai-drag-handle" id="ai-drag-handle"></div>
-  <div class="ai-panel-inner">
-    <div class="ai-panel-header">
-      <span class="ai-panel-title">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Google Gemini AI
-      </span>
-      <button class="ai-panel-close" onclick="toggleAiPanel()">✕</button>
-    </div>
-    <div class="ai-messages" id="ai-messages">
-      <div class="ai-msg ai-msg--bot">
-        <div class="ai-msg-bubble">Xin chào! Tôi có thể giúp bạn tìm ảnh hoặc trả lời các câu hỏi về sự kiện của Trường THPT Lộc Hiệp. Hãy thử hỏi tôi nhé! 😊</div>
-      </div>
-    </div>
-    <div class="ai-input-wrap">
-      <input class="ai-input" id="ai-input" type="text" placeholder="Hỏi hoặc tìm kiếm ảnh..." autocomplete="off"/>
-      <button class="ai-send-btn" id="ai-send" onclick="sendAiMessage()">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      </button>
-    </div>
   </div>
 </div>
 
