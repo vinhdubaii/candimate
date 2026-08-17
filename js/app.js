@@ -4,7 +4,6 @@
 
 /* ── CONFIG ── */
 const BASE_URL    = '';   // Cloudflare Pages — path tương đối
-const WORKER_URL  = 'https://candimate.pages.dev/ai'; // _worker.js endpoint
 
 /* ── HELPERS ── */
 const $  = id  => document.getElementById(id);
@@ -237,6 +236,7 @@ function makeCard(p, i, onClickFn) {
 function buildHomeGallery() {
   $('sb-home')?.classList.add('active');
   $('sb-albums')?.classList.remove('active');
+  $('sb-favorites')?.classList.remove('active');
 
   const container = $('albums-container');
   if (!container) return;
@@ -336,6 +336,7 @@ function buildTopSearchBar() {
 function openAlbumsPage() {
   $('sb-albums')?.classList.add('active');
   $('sb-home')?.classList.remove('active');
+  $('sb-favorites')?.classList.remove('active');
 
   const container = $('albums-container');
   if (!container) return;
@@ -534,6 +535,7 @@ function updateLb() {
   el.src = p.full || p.url; el.alt = p.name;
   $('lb-name').textContent    = p.name;
   $('lb-counter').textContent = `${currentIdx + 1} / ${filtered.length}`;
+  syncFavBtn(p.url);
 
   const dl = $('lb-download');
   const imgUrl  = p.full || p.url;
@@ -760,20 +762,19 @@ async function buildSuggestions() {
 }
 
 /* ══════════════════════════════════════
-   UNIFIED MODAL SYSTEM — Search / AI / Music
+   UNIFIED MODAL SYSTEM — Search / Music
 ══════════════════════════════════════ */
-let panelOpen = false, aiOpenState = false, musicPickerOpen = false, settingsOpen = false;
+let panelOpen = false, musicPickerOpen = false, settingsOpen = false;
 
 function _setModal(id, btnId, open) {
   $(id)?.classList.toggle('open', open);
   $(btnId)?.classList.toggle('active', open);
 }
-function _anyModalOpen() { return panelOpen || aiOpenState || musicPickerOpen; }
+function _anyModalOpen() { return panelOpen || musicPickerOpen; }
 function _syncOverlay() { $('modal-overlay')?.classList.toggle('open', _anyModalOpen()); }
 
 function closeAllModals() {
   if (panelOpen)       toggleSbPanel(true);
-  if (aiOpenState)      toggleAiPanel(true);
   if (musicPickerOpen)  toggleMusicPicker(true);
 }
 
@@ -781,23 +782,10 @@ function toggleSbPanel(forceClose) {
   panelOpen = forceClose ? false : !panelOpen;
   _setModal('sb-panel', 'sb-search', panelOpen);
   if (panelOpen) {
-    if (aiOpenState)     { aiOpenState = false; _setModal('ai-panel', 'sb-ai', false); }
     if (musicPickerOpen) { musicPickerOpen = false; _setModal('music-picker', 'music-btn', false); }
     if (window.innerWidth > 768) setTimeout(() => $('sb-search-input')?.focus(), 260);
     buildSuggestions();
     closeSettings();
-  }
-  _syncOverlay();
-}
-
-function toggleAiPanel(forceClose) {
-  aiOpenState = forceClose ? false : !aiOpenState;
-  _setModal('ai-panel', 'sb-ai', aiOpenState);
-  if (aiOpenState) {
-    if (panelOpen)        { panelOpen = false; _setModal('sb-panel', 'sb-search', false); }
-    if (musicPickerOpen)  { musicPickerOpen = false; _setModal('music-picker', 'music-btn', false); }
-    closeSettings();
-    setTimeout(() => $('ai-input')?.focus(), 260);
   }
   _syncOverlay();
 }
@@ -807,7 +795,6 @@ function toggleMusicPicker(forceClose) {
   _setModal('music-picker', 'music-btn', musicPickerOpen);
   if (musicPickerOpen) {
     if (panelOpen)    { panelOpen = false; _setModal('sb-panel', 'sb-search', false); }
-    if (aiOpenState)  { aiOpenState = false; _setModal('ai-panel', 'sb-ai', false); }
     closeSettings();
     syncPickerUI();
   }
@@ -993,182 +980,102 @@ document.addEventListener('click', startOnFirst); document.addEventListener('tou
 audio.src = TRACKS[trackIdx].src; audio.loop = repeatMode === 'one'; syncPickerUI();
 
 /* ══════════════════════════════════════
-   AI PANEL — biến trạng thái chat
+   YÊU THÍCH (Favorites)
 ══════════════════════════════════════ */
-let aiHistory = [];   // [{ role: 'user'|'bot', text }]
-let aiLoading = false;
+const FAV_KEY = 'favorites'; // { [photoUrl]: timestamp }
 
-/* ── Build metadata gửi lên Worker ── */
-function buildMetadata() {
-  return ALBUMS.map(album => {
-    const id     = albumFileToId(album.file);
-    const photos = (albumData[id] || []).map(p => p.name);
-    return {
-      albumId:   id,
-      title:     album.title,
-      emoji:     album.emoji,
-      date:      album.date,
-      photoCount: photos.length,
-      photos,
-    };
-  });
+function getFavoritesMap() {
+  try { return JSON.parse(localStorage.getItem(FAV_KEY) || '{}'); } catch { return {}; }
+}
+function saveFavoritesMap(map) {
+  try { localStorage.setItem(FAV_KEY, JSON.stringify(map)); } catch {}
+}
+function isFavorite(url) { return !!getFavoritesMap()[url]; }
+function toggleFavorite(url) {
+  const map = getFavoritesMap();
+  if (map[url]) delete map[url]; else map[url] = Date.now();
+  saveFavoritesMap(map);
+  return !!map[url];
+}
+function syncFavBtn(url) {
+  $('lb-fav-btn')?.classList.toggle('active', isFavorite(url));
+}
+function toggleFavoriteCurrentPhoto() {
+  const item = filtered[currentIdx]; if (!item) return;
+  toggleFavorite(item.p.url);
+  syncFavBtn(item.p.url);
 }
 
-/* ── Render tin nhắn ── */
-function appendMsg(role, content) {
-  const msgs  = $('ai-messages'); if (!msgs) return;
-  const wrap  = document.createElement('div');
-  wrap.className = `ai-msg ai-msg--${role}`;
+/* ══════════════════════════════════════
+   TRANG YÊU THÍCH — nhóm theo ngày, mới nhất trước
+══════════════════════════════════════ */
+function openFavoritesPage() {
+  $('sb-favorites')?.classList.add('active');
+  $('sb-home')?.classList.remove('active');
+  $('sb-albums')?.classList.remove('active');
 
-  if (typeof content === 'string') {
-    const bubble = document.createElement('div');
-    bubble.className = 'ai-msg-bubble';
-    bubble.textContent = content;
-    wrap.appendChild(bubble);
-  } else {
-    // content là DOM node (ví dụ grid ảnh)
-    wrap.appendChild(content);
+  const container = $('albums-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const favMap  = getFavoritesMap();
+  const favUrls = Object.keys(favMap);
+
+  if (!favUrls.length) {
+    container.innerHTML = `
+      <div class="fav-empty">
+        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        <p>Chưa có ảnh yêu thích nào. Bấm biểu tượng Bookmark khi xem ảnh để lưu vào đây nhé.</p>
+      </div>`;
+    return;
   }
 
-  msgs.appendChild(wrap);
-  msgs.scrollTop = msgs.scrollHeight;
-  return wrap;
-}
+  // Ghép dữ liệu ảnh yêu thích + thời điểm thích, sắp mới nhất trước
+  const favItems = getAllPhotosFlat()
+    .filter(({ p }) => favMap[p.url])
+    .map(item => ({ ...item, ts: favMap[item.p.url] }))
+    .sort((a, b) => b.ts - a.ts);
 
-function showTyping() {
-  const msgs  = $('ai-messages'); if (!msgs) return null;
-  const wrap  = document.createElement('div');
-  wrap.className = 'ai-msg ai-msg--bot ai-typing';
-  const bubble = document.createElement('div');
-  bubble.className = 'ai-msg-bubble';
-  [0,1,2].forEach(() => {
-    const dot = document.createElement('span');
-    dot.className = 'ai-typing-dot';
-    bubble.appendChild(dot);
-  });
-  wrap.appendChild(bubble);
-  msgs.appendChild(wrap);
-  msgs.scrollTop = msgs.scrollHeight;
-  return wrap;
-}
-
-/* ── Render kết quả ảnh ── */
-function renderPhotoResults(results) {
-  const wrap = document.createElement('div');
-  wrap.className = 'ai-msg-bubble';
-
-  if (!results || !results.length) {
-    wrap.textContent = 'Mình không tìm thấy ảnh phù hợp. Bạn thử mô tả khác nhé! 😊';
-    return wrap;
-  }
-
-  const label = document.createElement('div');
-  label.style.cssText = 'font-size:12px;color:var(--muted);margin-bottom:8px;';
-  label.textContent   = `Tìm thấy ${results.length} ảnh phù hợp:`;
-  wrap.appendChild(label);
-
-  const grid = document.createElement('div');
-  grid.className = 'ai-photo-grid';
-
-  results.forEach(({ albumId, photoName }) => {
-    const photos    = albumData[albumId] || [];
-    const albumMeta = ALBUMS.find(a => albumFileToId(a.file) === albumId);
-    const photo     = photos.find(p => p.name === photoName) || photos[0];
-    if (!photo) return;
-
-    const img = document.createElement('img');
-    img.src   = photo.url; img.loading = 'lazy';
-    img.title = photo.name;
-    img.addEventListener('click', () => {
-      const albumFiltered = photos.map(p => ({ p, albumId, albumMeta }));
-      filtered   = albumFiltered;
-      currentIdx = photos.indexOf(photo);
-      openLb();
-    });
-    grid.appendChild(img);
-  });
-
-  wrap.appendChild(grid);
-  return wrap;
-}
-
-/* ── Gửi message ── */
-async function sendAiMessage() {
-  const input = $('ai-input'); if (!input) return;
-  const query = input.value.trim();
-  if (!query || aiLoading) return;
-
-  // Hiện tin nhắn user
-  appendMsg('user', query);
-  aiHistory.push({ role: 'user', text: query });
-  input.value = '';
-  $('ai-send').disabled = true;
-  aiLoading = true;
-
-  // Typing indicator
-  const typingEl = showTyping();
-
-  try {
-    const res = await fetch(WORKER_URL, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query,
-        metadata: buildMetadata(),
-        history:  aiHistory.slice(-6),
-      }),
-    });
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-
-    typingEl?.remove();
-
-    if (data.type === 'search') {
-      const node = renderPhotoResults(data.results);
-      const msgWrap = document.createElement('div');
-      msgWrap.className = 'ai-msg ai-msg--bot';
-      msgWrap.appendChild(node);
-      $('ai-messages').appendChild(msgWrap);
-      $('ai-messages').scrollTop = $('ai-messages').scrollHeight;
-      aiHistory.push({ role: 'bot', text: `[Kết quả tìm kiếm: ${data.results?.length || 0} ảnh]` });
-    } else {
-      const text = data.text || 'Xin lỗi, mình không hiểu câu hỏi này. Bạn thử hỏi lại nhé!';
-      appendMsg('bot', text);
-      aiHistory.push({ role: 'bot', text });
+  // Nhóm theo ngày (dựa vào thời điểm bấm thích)
+  const groups = [];
+  const dayIndex = new Map();
+  favItems.forEach(item => {
+    const d = new Date(item.ts);
+    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    if (!dayIndex.has(key)) {
+      const label = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const group = { label, items: [] };
+      dayIndex.set(key, group);
+      groups.push(group);
     }
+    dayIndex.get(key).items.push(item);
+  });
 
-  } catch (err) {
-    typingEl?.remove();
-    appendMsg('bot', 'Rất tiếc, có lỗi xảy ra. Vui lòng thử lại sau! 😔');
-  }
+  // Danh sách phẳng dùng cho Lightbox — điều hướng prev/next xuyên suốt mọi ngày
+  const flatForLb = favItems.map(({ p, albumId, albumMeta }) => ({ p, albumId, albumMeta }));
 
-  $('ai-send').disabled = false;
-  aiLoading = false;
-  input.focus();
+  const frag = document.createDocumentFragment();
+  let globalIdx = 0;
+  groups.forEach(group => {
+    const heading = document.createElement('div');
+    heading.className = 'fav-day-heading';
+    heading.textContent = group.label;
+    frag.appendChild(heading);
+
+    const gallery = document.createElement('div');
+    gallery.className = 'gallery';
+    group.items.forEach(item => {
+      const idxForThisCard = globalIdx;
+      const card = makeCard(item.p, globalIdx, () => {
+        filtered   = flatForLb;
+        currentIdx = idxForThisCard;
+        openLb();
+      });
+      gallery.appendChild(card);
+      globalIdx++;
+    });
+    frag.appendChild(gallery);
+  });
+  container.appendChild(frag);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
-/* ── Gửi bằng Enter ── */
-$('ai-input')?.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAiMessage(); }
-});
-
-/* ── Đóng khi nhấn Escape: đã xử lý chung trong Unified Modal System ── */
-
-/* ── Mobile: kéo để đóng bottom sheet ── */
-;(function initAiSwipe() {
-  const panel  = $('ai-panel'); if (!panel) return;
-  let startY   = 0, isDragging = false;
-  const handle = $('ai-drag-handle');
-
-  function onStart(y) { startY = y; isDragging = true; }
-  function onEnd(y)   {
-    if (!isDragging) return; isDragging = false;
-    if (y - startY > 80) toggleAiPanel(); // kéo xuống 80px → đóng
-  }
-
-  handle?.addEventListener('touchstart', e => onStart(e.touches[0].clientY),      { passive: true });
-  handle?.addEventListener('touchend',   e => onEnd(e.changedTouches[0].clientY),  { passive: true });
-  handle?.addEventListener('mousedown',  e => onStart(e.clientY));
-  window.addEventListener('mouseup',     e => { if (isDragging) onEnd(e.clientY); });
-})();
