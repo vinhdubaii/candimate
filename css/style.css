@@ -576,6 +576,8 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
   backdrop-filter: blur(8px);
 }
 .lb-btn:hover, .lb-zoom-btn:hover { background: var(--accent); border-color: var(--accent); }
+.lb-btn.active { background: var(--accent); border-color: var(--accent); }
+.lb-btn.active svg { fill: currentColor; }
 .lb-close {
   position: absolute; top: 16px; right: 16px;
   background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
@@ -710,127 +712,27 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
 #info-btn.active { background: var(--accent); border-color: var(--accent); }
 
 /* ═══════════════════════════════
-   AI PANEL
+   MODAL HEADER — dùng chung cho Search / Music picker
 ═══════════════════════════════ */
-
-/* AI Panel — dùng chung .center-modal, chỉ style nội dung riêng */
-.ai-drag-handle { display: none; } /* ẩn trên PC, hiện lại ở mobile media query */
-
-.ai-panel-inner {
-  width: 100%; height: 100%;
-  display: flex; flex-direction: column;
-}
-
-/* Header */
-.ai-panel-header {
+.modal-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px 16px 14px;
   border-bottom: 1px solid var(--glass-border);
   flex-shrink: 0;
 }
-.ai-panel-title {
+.modal-title {
   display: flex; align-items: center; gap: 8px;
   font-family: 'Fraunces', serif; font-size: 16px;
   font-weight: 700; color: var(--text);
 }
-.ai-panel-close {
+.modal-close {
   background: none; border: none; cursor: pointer;
   color: var(--muted); font-size: 16px;
   width: 28px; height: 28px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   transition: background .2s, color .2s;
 }
-.ai-panel-close:hover { background: rgba(255,255,255,.12); color: var(--text); }
-
-/* Messages */
-.ai-messages {
-  flex: 1; overflow-y: auto; overflow-x: hidden;
-  padding: 16px 14px;
-  display: flex; flex-direction: column; gap: 12px;
-  scroll-behavior: smooth;
-}
-.ai-messages::-webkit-scrollbar { width: 3px; }
-.ai-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 3px; }
-
-.ai-msg { display: flex; }
-.ai-msg--bot  { justify-content: flex-start; }
-.ai-msg--user { justify-content: flex-end; }
-
-.ai-msg-bubble {
-  max-width: 85%; padding: 10px 14px;
-  border-radius: 18px; font-size: 13px;
-  line-height: 1.6; color: var(--text);
-}
-.ai-msg--bot  .ai-msg-bubble {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-bottom-left-radius: 4px;
-}
-.ai-msg--user .ai-msg-bubble {
-  background: var(--accent);
-  color: #fff;
-  border-bottom-right-radius: 4px;
-}
-
-/* Typing indicator */
-.ai-typing .ai-msg-bubble {
-  display: flex; align-items: center; gap: 5px; padding: 12px 16px;
-}
-.ai-typing-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--muted);
-  animation: typingBounce 1.2s infinite ease-in-out;
-}
-.ai-typing-dot:nth-child(2) { animation-delay: .2s; }
-.ai-typing-dot:nth-child(3) { animation-delay: .4s; }
-
-/* Kết quả ảnh từ AI search */
-.ai-photo-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 4px; margin-top: 8px; border-radius: 12px; overflow: hidden;
-}
-.ai-photo-grid img {
-  width: 100%; aspect-ratio: 1; object-fit: cover;
-  cursor: pointer; transition: opacity .2s;
-}
-.ai-photo-grid img:hover { opacity: .85; }
-
-/* Input wrap */
-.ai-input-wrap {
-  display: flex; align-items: center; gap: 8px;
-  padding: 12px 14px;
-  border-top: 1px solid var(--glass-border);
-  flex-shrink: 0;
-}
-.ai-input {
-  flex: 1; background: rgba(255,255,255,.08);
-  border: 1px solid var(--glass-border);
-  border-radius: 100px; padding: 9px 16px;
-  font-size: 13px; color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  outline: none; transition: border-color .2s;
-}
-.ai-input::placeholder { color: var(--muted); }
-.ai-input:focus { border-color: var(--accent); }
-
-.ai-send-btn {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: var(--accent); border: none;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; cursor: pointer; flex-shrink: 0;
-  transition: transform .15s, background .2s;
-}
-.ai-send-btn:hover  { transform: scale(1.08); }
-.ai-send-btn:active { transform: scale(.95); }
-.ai-send-btn:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
-
-/* Active state nút AI sidebar */
-#sb-ai.active { color: var(--accent); }
-
-@keyframes typingBounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  30%            { transform: translateY(-6px); }
-}
+.modal-close:hover { background: rgba(255,255,255,.12); color: var(--text); }
 
 /* ═══════════════════════════════
    ANIMATIONS
@@ -881,9 +783,9 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
   }
   #sb-upload svg { width: 22px; height: 22px; stroke-width: 1.6; }
 
-  /* Search / AI / Music — bottom sheet gần full, đồng bộ 3 cái, có overlay tối, KHÔNG animation (tránh lag) */
+  /* Search / Music — bottom sheet gần full, đồng bộ, có overlay tối, KHÔNG animation (tránh lag) */
   .center-modal,
-  .sb-panel, .ai-panel, .music-picker {
+  .sb-panel, .music-picker {
     top: var(--sb-gap) !important;
     left: var(--sb-gap) !important;
     right: var(--sb-gap) !important;
@@ -897,7 +799,7 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
     transition: none !important;
   }
   .center-modal.open,
-  .sb-panel.open, .ai-panel.open, .music-picker.open {
+  .sb-panel.open, .music-picker.open {
     height: calc(100vh - 54px - var(--sb-gap) * 3 - 4px) !important;
     border-color: var(--glass-border) !important;
     box-shadow: var(--glass-shadow) !important;
@@ -906,7 +808,6 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
   }
   .modal-overlay { transition: none !important; }
   .sb-panel-inner { width: 100% !important; }
-  .ai-panel-inner { width: 100% !important; }
 
   /* Settings drawer — mobile: bottom sheet gần full, KHÔNG animation */
   .settings-popup {
@@ -950,9 +851,6 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
     min-width: 260px !important; max-width: 90vw !important;
   }
   .lb-bar { flex-wrap: wrap; gap: 8px; }
-
-  /* AI photo grid mobile */
-  .ai-photo-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* ═══════════════════════════════
@@ -985,3 +883,22 @@ body.perf-saver .sb-logo-btn:hover { transform: none !important; }
 .wallpaper-picker-note { display: none; font-size: 11px; color: var(--muted); margin: -4px 0 10px; line-height: 1.5; }
 body.perf-saver .wallpaper-picker-note { display: block; }
 body.perf-saver .wallpaper-grid { opacity: .4; pointer-events: none; }
+
+/* ═══════════════════════════════
+   TRANG YÊU THÍCH
+═══════════════════════════════ */
+.fav-day-heading {
+  font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700;
+  color: var(--text); padding: 24px 32px 12px; opacity: .85;
+}
+.fav-day-heading:first-child { padding-top: 16px; }
+.fav-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 80px 24px; text-align: center; color: var(--muted);
+}
+.fav-empty svg { width: 40px; height: 40px; opacity: .4; }
+.fav-empty p { font-size: 14px; max-width: 280px; line-height: 1.6; }
+
+@media (max-width: 768px) {
+  .fav-day-heading { padding: 18px 16px 8px; }
+}
