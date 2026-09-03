@@ -414,7 +414,14 @@
 
   <audio id="bgAudio" src="https://res.cloudinary.com/dlrax6e5x/video/upload/v1788422190/nlrxi1nzrxs0czncdwto.mp3" preload="auto"></audio>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/auth.js"></script>
 <script>
+  // Đã đăng nhập sẵn (session còn hạn) -> khỏi xem lại welcome, vào thẳng trang chính.
+  cm_ensureCookieSynced().then(session => {
+    if (session) window.location.href = '/';
+  });
+
   const startOverlay = document.getElementById('startOverlay');
   const startBtn = document.getElementById('startBtn');
   const introOrb = document.getElementById('introOrb');
@@ -549,8 +556,25 @@
     loginScreen.classList.add('show');
   });
 
-  googleBtn.addEventListener('click', () => {
-    // TODO: gọi supabase.auth.signInWithOAuth({ provider: 'google' })
+  googleBtn.addEventListener('click', async () => {
+    googleBtn.disabled = true;
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin + '/welcome.html' }
+    });
+    if (error) {
+      googleBtn.disabled = false;
+      alert('Đăng nhập thất bại: ' + error.message);
+    }
+    // Nếu thành công, trình duyệt sẽ redirect sang Google rồi quay lại đây.
+  });
+
+  // Khi Supabase xử lý xong OAuth callback (code trong URL) và tạo session,
+  // sự kiện SIGNED_IN sẽ bắn ra -> đồng bộ cookie xong thì vào trang chính.
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      window.location.href = '/';
+    }
   });
 </script>
 
