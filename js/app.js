@@ -236,7 +236,6 @@ function makeCard(p, i, onClickFn) {
 function buildHomeGallery() {
   $('sb-home')?.classList.add('active');
   $('sb-albums')?.classList.remove('active');
-  $('sb-favorites')?.classList.remove('active');
 
   const container = $('albums-container');
   if (!container) return;
@@ -336,7 +335,6 @@ function buildTopSearchBar() {
 function openAlbumsPage() {
   $('sb-albums')?.classList.add('active');
   $('sb-home')?.classList.remove('active');
-  $('sb-favorites')?.classList.remove('active');
 
   const container = $('albums-container');
   if (!container) return;
@@ -833,7 +831,7 @@ async function buildSuggestions() {
 /* ══════════════════════════════════════
    UNIFIED MODAL SYSTEM — Search / Music
 ══════════════════════════════════════ */
-let panelOpen = false, musicPickerOpen = false, settingsOpen = false;
+let panelOpen = false, musicPickerOpen = false, settingsOpen = false, accountOpen = false;
 
 function _setModal(id, btnId, open) {
   $(id)?.classList.toggle('open', open);
@@ -855,6 +853,7 @@ function toggleSbPanel(forceClose) {
     if (window.innerWidth > 768) setTimeout(() => $('sb-search-input')?.focus(), 260);
     buildSuggestions();
     closeSettings();
+    closeAccountPanel();
   }
   _syncOverlay();
 }
@@ -865,6 +864,7 @@ function toggleMusicPicker(forceClose) {
   if (musicPickerOpen) {
     if (panelOpen)    { panelOpen = false; _setModal('sb-panel', 'sb-search', false); }
     closeSettings();
+    closeAccountPanel();
     syncPickerUI();
   }
   _syncOverlay();
@@ -880,9 +880,10 @@ document.addEventListener('keydown', e => {
 function toggleSettings() {
   settingsOpen = !settingsOpen;
   $('settings-popup').classList.toggle('open', settingsOpen);
-  $('sb-settings').classList.toggle('active', settingsOpen);
+  $('topright-settings-btn')?.classList.toggle('active', settingsOpen);
   if (settingsOpen) {
     closeAllModals();
+    closeAccountPanel();
     revealSidebar(); // Settings mở ra thì sidebar PHẢI hiện, không ẩn/không bị đè
   } else {
     if (autoHideEnabled && !$('sidebar')?.matches(':hover')) scheduleHideSidebar();
@@ -891,7 +892,29 @@ function toggleSettings() {
 function closeSettings() {
   settingsOpen = false;
   $('settings-popup')?.classList.remove('open');
-  $('sb-settings')?.classList.remove('active');
+  $('topright-settings-btn')?.classList.remove('active');
+}
+
+/* ══════════════════════════════════════
+   ACCOUNT PANEL — avatar/tên + danh sách đã lưu
+══════════════════════════════════════ */
+function toggleAccountPanel() {
+  accountOpen = !accountOpen;
+  $('account-popup').classList.toggle('open', accountOpen);
+  $('sb-account')?.classList.toggle('active', accountOpen);
+  if (accountOpen) {
+    closeAllModals();
+    closeSettings();
+    revealSidebar();
+    renderAccountBookmarks();
+  } else {
+    if (autoHideEnabled && !$('sidebar')?.matches(':hover')) scheduleHideSidebar();
+  }
+}
+function closeAccountPanel() {
+  accountOpen = false;
+  $('account-popup')?.classList.remove('open');
+  $('sb-account')?.classList.remove('active');
 }
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -899,9 +922,14 @@ function scrollToTop() {
 }
 
 document.addEventListener('click', e => {
-  const popup = $('settings-popup'), settBtn = $('sb-settings');
+  const popup = $('settings-popup'), settBtn = $('topright-settings-btn');
   if (settingsOpen && !popup?.contains(e.target) && !settBtn?.contains(e.target)) {
     closeSettings();
+    if (autoHideEnabled && !$('sidebar')?.matches(':hover')) scheduleHideSidebar();
+  }
+  const accPopup = $('account-popup'), accBtn = $('sb-account');
+  if (accountOpen && !accPopup?.contains(e.target) && !accBtn?.contains(e.target)) {
+    closeAccountPanel();
     if (autoHideEnabled && !$('sidebar')?.matches(':hover')) scheduleHideSidebar();
   }
 });
@@ -935,10 +963,10 @@ function revealSidebar() {
   clearTimeout(sidebarRevealTimer);
 }
 function scheduleHideSidebar() {
-  if (settingsOpen) return; // đang mở Settings thì không được ẩn
+  if (settingsOpen || accountOpen) return; // đang mở Settings/Account thì không được ẩn
   clearTimeout(sidebarRevealTimer);
   sidebarRevealTimer = setTimeout(() => {
-    if (settingsOpen) return;
+    if (settingsOpen || accountOpen) return;
     $('sidebar')?.classList.remove('revealed');
     if (autoHideEnabled) document.body.classList.add('autohide-collapsed');
   }, 400);
@@ -1073,17 +1101,14 @@ function toggleFavoriteCurrentPhoto() {
   const item = filtered[currentIdx]; if (!item) return;
   toggleFavorite(item.p.url);
   syncFavBtn(item.p.url);
+  if (accountOpen) renderAccountBookmarks();
 }
 
 /* ══════════════════════════════════════
-   TRANG YÊU THÍCH — nhóm theo ngày, mới nhất trước
+   BOOKMARK TRONG ACCOUNT PANEL — nhóm theo ngày, mới nhất trước
 ══════════════════════════════════════ */
-function openFavoritesPage() {
-  $('sb-favorites')?.classList.add('active');
-  $('sb-home')?.classList.remove('active');
-  $('sb-albums')?.classList.remove('active');
-
-  const container = $('albums-container');
+function renderAccountBookmarks() {
+  const container = $('account-fav-list');
   if (!container) return;
   container.innerHTML = '';
 
@@ -1092,9 +1117,8 @@ function openFavoritesPage() {
 
   if (!favUrls.length) {
     container.innerHTML = `
-      <div class="fav-empty">
-        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-        <p>Chưa có ảnh yêu thích nào. Bấm biểu tượng Bookmark khi xem ảnh để lưu vào đây nhé.</p>
+      <div class="account-fav-empty">
+        Chưa có ảnh yêu thích nào. Bấm biểu tượng Bookmark khi xem ảnh để lưu vào đây nhé.
       </div>`;
     return;
   }
@@ -1131,22 +1155,22 @@ function openFavoritesPage() {
     heading.textContent = group.label;
     frag.appendChild(heading);
 
-    const gallery = document.createElement('div');
-    gallery.className = 'gallery';
+    const grid = document.createElement('div');
+    grid.className = 'account-fav-grid';
     group.items.forEach(item => {
       const idxForThisCard = globalIdx;
       const card = makeCard(item.p, globalIdx, () => {
         filtered   = flatForLb;
         currentIdx = idxForThisCard;
+        closeAccountPanel();
         openLb();
       });
-      gallery.appendChild(card);
+      grid.appendChild(card);
       globalIdx++;
     });
-    frag.appendChild(gallery);
+    frag.appendChild(grid);
   });
   container.appendChild(frag);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /* ══════════════════════════════════════

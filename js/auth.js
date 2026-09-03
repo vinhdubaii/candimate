@@ -57,3 +57,15 @@ async function cm_signOut() {
   cm_deleteCookie('sb-access-token');
   window.location.href = '/welcome.html';
 }
+
+// Lấy avatar/tên/email từ tài khoản Google đã đăng nhập qua Supabase.
+async function cm_getUserInfo() {
+  const { data, error } = await supabaseClient.auth.getUser();
+  if (error || !data?.user) return null;
+  const meta = data.user.user_metadata || {};
+  return {
+    avatarUrl: meta.avatar_url || meta.picture || null,
+    name: meta.full_name || meta.name || (data.user.email ? data.user.email.split('@')[0] : 'Người dùng'),
+    email: data.user.email || '',
+  };
+}

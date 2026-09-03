@@ -124,6 +124,12 @@ body.dark .sb-btn:hover { background: rgba(255,255,255,.08); }
 .sb-btn.active { color: var(--sb-active-fg); background: var(--sb-active-bg); }
 .sb-spacer { height: 8px; flex: none; }
 
+/* Nút Account — avatar tròn thay icon khi có ảnh Google */
+.sb-account-btn { overflow: hidden; }
+.sb-account-btn img#sb-account-avatar {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;
+}
+
 /* Upload button special */
 .sb-upload-btn {
   text-decoration: none;
@@ -295,6 +301,67 @@ body.dark .sb-sr-item:hover { background: rgba(255,255,255,.07); }
 }
 .settings-popup.open { display: block; } /* không animation, hiện tức thì */
 body.sidebar-right .settings-popup { left: auto; right: calc(var(--sb-gap) * 2 + var(--sb-w)); }
+
+/* ═══════════════════════════════
+   ACCOUNT PANEL — dùng chung khung .settings-popup
+═══════════════════════════════ */
+.account-header { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+.account-avatar-lg {
+  width: 56px; height: 56px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+  background: var(--glass-border);
+}
+.account-avatar-fallback { padding: 12px; box-sizing: border-box; color: var(--muted); }
+.account-header-text { min-width: 0; }
+.account-name { font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.account-email { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.account-fav-list { margin-top: 4px; }
+.account-fav-list .fav-day-heading { padding: 14px 0 8px; font-size: 11px; }
+.account-fav-list .fav-day-heading:first-child { padding-top: 0; }
+.account-fav-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+}
+.account-fav-grid .photo-card { margin-bottom: 0; aspect-ratio: 1 / 1; border-radius: 8px; }
+.account-fav-empty { font-size: 13px; color: var(--muted); line-height: 1.6; padding: 10px 0 4px; }
+
+/* ═══════════════════════════════
+   SETTINGS TRIGGER — nút tròn góc trên-phải, hover hiện nhãn "Settings"
+═══════════════════════════════ */
+.topright-settings-btn {
+  position: fixed;
+  top: var(--sb-gap); right: var(--sb-gap);
+  z-index: 490;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  border: none; border-radius: 999px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  color: var(--muted);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+  transition: color .18s, padding .22s ease, min-width .22s ease;
+}
+.topright-settings-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+.topright-settings-btn .topright-settings-label {
+  font-size: 13px; font-weight: 600; white-space: nowrap;
+  max-width: 0; opacity: 0; overflow: hidden;
+  transition: max-width .22s ease, opacity .18s ease;
+}
+.topright-settings-btn:hover,
+.topright-settings-btn.active {
+  color: var(--text);
+  padding: 0 16px 0 14px;
+}
+.topright-settings-btn:hover .topright-settings-label,
+.topright-settings-btn.active .topright-settings-label {
+  max-width: 80px; opacity: 1;
+}
+body.sidebar-right .topright-settings-btn { right: auto; left: var(--sb-gap); }
 
 .settings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .settings-close-btn {
@@ -846,6 +913,8 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
   .top-searchbar-wrap { margin: 18px auto 12px; }
 
   #rightsb-row   { display: none; }
+  .topright-settings-btn { top: calc(var(--sb-gap)); height: 36px; min-width: 36px; }
+  .topright-settings-btn svg { width: 18px; height: 18px; }
   .gallery       { padding: 8px 12px 24px; columns: 2 140px; }
   .album-header  { padding: 20px 16px 10px; }
   .album-divider { margin: 0 16px 8px; }
