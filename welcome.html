@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#FF3333;
+    --indigo:#3139FB;
+    --blue:#0047FF;
+    --cream:#FFFADD;
+    --black:#050507;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{
+    height:100%;
+    background:var(--black);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    overflow:hidden;
+  }
+
+  /* ---------- STAGE ---------- */
+  #stage{
+    position:fixed;
+    inset:0;
+    background:var(--black);
+    z-index:20;
+    transition:opacity .7s ease;
+  }
+  #stage.hide{
+    opacity:0;
+    pointer-events:none;
+  }
+
+  /* ---------- START OVERLAY ---------- */
+  #startOverlay{
+    position:absolute;
+    inset:0;
+    z-index:30;
+    background:var(--black);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+    transition:opacity .5s ease;
+  }
+  #startOverlay.hide{
+    opacity:0;
+    pointer-events:none;
+  }
+  .start-orb{
+    width:64px;height:64px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #6c86ff, var(--indigo) 45%, var(--blue) 75%, transparent 78%);
+    filter:blur(1px);
+    box-shadow:0 0 40px 10px rgba(49,57,251,.55);
+    animation:orbBreatheSmall 2.6s ease-in-out infinite;
+  }
+  @keyframes orbBreatheSmall{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.15);}
+  }
+  #startBtn{
+    font-family:inherit;
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:.01em;
+    color:var(--black);
+    background:var(--cream);
+    border:none;
+    border-radius:999px;
+    padding:13px 28px;
+    cursor:pointer;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  #startBtn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 24px rgba(255,250,221,.18);
+  }
+  #startBtn:active{
+    transform:translateY(0px) scale(.97);
+  }
+
+  /* ---------- PHASE 1: blended breathing orb ---------- */
+  #introOrb{
+    position:absolute;
+    top:50%; left:50%;
+    width:126px;
+    height:126px;
+    margin:-63px 0 0 -63px;
+    border-radius:58% 42% 55% 45% / 45% 55% 45% 55%;
+    overflow:hidden;
+    filter:blur(7px);
+    opacity:0;
+    z-index:5;
+    background:radial-gradient(circle, #1c1fb0, #0047FF 80%);
+    box-shadow:0 0 50px 14px rgba(49,57,251,.35);
+  }
+  #introOrb.breathe{
+    opacity:1;
+    animation:orbFloat 8.4s ease-in-out infinite, blobMorph 5.2s ease-in-out infinite;
+  }
+  #introOrb.fadeout{
+    animation:none;
+    opacity:0;
+    transition:opacity .5s ease;
+  }
+  @keyframes orbFloat{
+    0%{   transform:scale(1); }
+    14%{  transform:scale(1.08); }
+    29%{  transform:scale(.92); }
+    43%{  transform:scale(1.16); }
+    58%{  transform:scale(.88); }
+    72%{  transform:scale(1.12); }
+    86%{  transform:scale(.95); }
+    100%{ transform:scale(1); }
+  }
+  @keyframes blobMorph{
+    0%{   border-radius:58% 42% 55% 45% / 45% 55% 45% 55%; }
+    20%{  border-radius:36% 64% 42% 58% / 62% 38% 68% 32%; }
+    38%{  border-radius:64% 36% 30% 70% / 42% 58% 30% 70%; }
+    55%{  border-radius:42% 58% 68% 32% / 68% 32% 55% 45%; }
+    73%{  border-radius:66% 34% 46% 54% / 34% 66% 40% 60%; }
+    88%{  border-radius:34% 66% 58% 42% / 58% 42% 64% 36%; }
+    100%{ border-radius:58% 42% 55% 45% / 45% 55% 45% 55%; }
+  }
+  #introOrb .orb-colors{
+    position:absolute;
+    inset:-45%;
+    background-image:
+      radial-gradient(circle, var(--red) 0%, rgba(255,51,51,0) 62%),
+      radial-gradient(circle, var(--indigo) 0%, rgba(49,57,251,0) 62%),
+      radial-gradient(circle, var(--blue) 0%, rgba(0,71,255,0) 62%),
+      radial-gradient(circle, var(--cream) 0%, rgba(255,250,221,0) 58%);
+    background-repeat:no-repeat;
+    background-size:65% 65%, 70% 70%, 68% 68%, 50% 50%;
+    background-position:22% 30%, 72% 22%, 30% 76%, 66% 68%;
+    animation:orbColorsDrift 6.5s ease-in-out infinite;
+    opacity:.95;
+  }
+  @keyframes orbColorsDrift{
+    0%{   background-position:22% 30%, 72% 22%, 30% 76%, 66% 68%; }
+    25%{  background-position:42% 58%, 54% 42%, 56% 38%, 40% 54%; }
+    50%{  background-position:72% 26%, 24% 70%, 66% 64%, 28% 30%; }
+    75%{  background-position:46% 66%, 60% 30%, 34% 54%, 56% 44%; }
+    100%{ background-position:22% 30%, 72% 22%, 30% 76%, 66% 68%; }
+  }
+
+  /* ---------- PHASE 2: full-screen animated gradient ---------- */
+  #gradientBg{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    clip-path:circle(0px at 50% 50%);
+    background:linear-gradient(135deg, #10184a, #0047FF);
+    overflow:hidden;
+    transition:clip-path 1.05s cubic-bezier(.16,.84,.3,1);
+  }
+  #gradientBg.reveal{
+    clip-path:circle(120% at 50% 50%);
+  }
+  #blobField{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+  }
+  .flow-blob{
+    position:absolute;
+    top:0; left:0;
+    border-radius:50%;
+    filter:blur(70px);
+    opacity:0;
+    pointer-events:none;
+    mix-blend-mode:screen;
+    will-change:transform, opacity;
+  }
+  /* ---------- LOGO (centered, slides up + unblurs) ---------- */
+  #logoWrap{
+    position:absolute;
+    inset:0;
+    z-index:6;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+  }
+  #logoWrap img{
+    width:84px;
+    height:84px;
+    display:block;
+    opacity:0;
+    transform:translateY(30px);
+    filter:blur(16px) drop-shadow(0 6px 24px rgba(0,0,0,.25));
+    transition:opacity .6s ease, transform .6s ease, filter .6s ease;
+  }
+  #logoWrap.show img{
+    opacity:1;
+    transform:translateY(0);
+    filter:blur(0) drop-shadow(0 6px 24px rgba(0,0,0,.25));
+  }
+  #logoWrap.hide img{
+    opacity:0;
+    transform:translateY(-14px);
+    filter:blur(10px);
+    transition:opacity .35s ease, transform .35s ease, filter .35s ease;
+  }
+
+  /* ---------- HEADLINE (word-by-word rise + blur) ---------- */
+  #headline{
+    position:absolute;
+    inset:0;
+    z-index:6;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:30px;
+    text-align:center;
+    padding:0 24px;
+    pointer-events:none;
+  }
+  #headline h1{
+    font-size:clamp(28px, 5.2vw, 48px);
+    font-weight:800;
+    line-height:1.14;
+    color:var(--cream);
+    letter-spacing:-.01em;
+  }
+  #headline .line{ display:block; }
+  #headline .word{
+    display:inline-block;
+    opacity:0;
+    transform:translateY(26px);
+    filter:blur(12px);
+    transition:opacity .55s ease, transform .55s ease, filter .55s ease;
+  }
+  #headline.show .word{
+    opacity:1;
+    transform:translateY(0);
+    filter:blur(0);
+  }
+  #headline .word:nth-child(1){ transition-delay:0s; }
+  #headline .line:nth-child(2) .word:nth-child(1){ transition-delay:.12s; }
+  #headline .line:nth-child(2) .word:nth-child(2){ transition-delay:.24s; }
+
+  #nextBtn{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    border:none;
+    background:var(--cream);
+    color:var(--blue);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 6px 20px rgba(0,0,0,.18);
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .5s ease, transform .5s ease, box-shadow .25s ease, background .25s ease;
+    pointer-events:none;
+  }
+  #headline.show-btn #nextBtn{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+  }
+  #nextBtn:hover{
+    transform:translateY(-3px) scale(1.04);
+  }
+  #nextBtn:active{
+    transform:translateY(0) scale(.95);
+  }
+  #nextBtn svg{ width:20px; height:20px; }
+
+  /* ---------- PLACEHOLDER SITE BEHIND ---------- */
+  #site{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    background:#0b0b10;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--cream);
+    text-align:center;
+    padding:24px;
+  }
+  #site p{
+    max-width:480px;
+    opacity:.6;
+    font-size:14px;
+    line-height:1.6;
+  }
+
+  /* ---------- LOGIN SCREEN (nền blob vẫn giữ nguyên phía sau) ---------- */
+  #loginScreen{
+    position:absolute;
+    inset:0;
+    z-index:7;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:24px;
+    opacity:0;
+    transition:opacity .5s ease;
+  }
+  #loginScreen.show{
+    display:flex;
+    opacity:1;
+  }
+  #loginScreen .login-logo{
+    width:56px;
+    height:56px;
+    margin-bottom:18px;
+    filter:drop-shadow(0 4px 16px rgba(0,0,0,.25));
+  }
+  #loginScreen h2{
+    font-size:clamp(22px, 3.2vw, 28px);
+    font-weight:800;
+    color:var(--cream);
+    margin-bottom:8px;
+  }
+  #loginScreen .login-sub{
+    font-size:14px;
+    color:rgba(255,250,221,.7);
+    max-width:320px;
+    line-height:1.5;
+    margin-bottom:30px;
+  }
+  .google-btn{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:inherit;
+    font-size:15px;
+    font-weight:700;
+    color:var(--black);
+    background:var(--cream);
+    border:none;
+    border-radius:999px;
+    padding:13px 26px;
+    cursor:pointer;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .google-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 24px rgba(255,250,221,.18);
+  }
+  .google-btn:active{
+    transform:translateY(0) scale(.97);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #introOrb, #introOrb .orb-colors, .flow-blob, .start-orb{ animation:none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="site">
+    <p>Đây là nội dung trang web chính của bạn — nằm phía sau màn hình chào mừng. Thay thế phần này bằng nội dung thật.</p>
+  </div>
+
+  <div id="stage">
+    <div id="introOrb"><div class="orb-colors"></div></div>
+
+    <div id="gradientBg">
+      <div id="blobField"></div>
+    </div>
+
+    <div id="logoWrap">
+      <img src="/darkmode-icon.png" alt="Logo">
+    </div>
+
+    <div id="headline">
+      <h1>
+        <span class="line"><span class="word">Meet</span> <span class="word">the</span></span>
+        <span class="line"><span class="word">internet,</span> <span class="word">again.</span></span>
+      </h1>
+      <button id="nextBtn" aria-label="Tiếp tục">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="loginScreen">
+      <img src="/darkmode-icon.png" alt="Logo" class="login-logo">
+      <h2>Đăng nhập để tiếp tục</h2>
+      <p class="login-sub">Bạn cần đăng nhập bằng Google để xem thư viện ảnh.</p>
+      <button id="googleBtn" class="google-btn">
+        <svg viewBox="0 0 48 48" width="20" height="20">
+          <path fill="#FFC107" d="M43.6 20.5H42V20.4H24v7.2h11.3C33.7 32 29.3 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.6 0 5 .9 6.9 2.5l5.1-5.1C32.7 7.6 28.6 6 24 6 14.1 6 6 14.1 6 24s8.1 18 18 18c9 0 17.2-6.5 17.2-18 0-1.2-.1-2.4-.4-3.5z"/>
+          <path fill="#FF3D00" d="M8.7 14.7l5.9 4.3C16.3 15.7 19.9 13 24 13c2.6 0 5 .9 6.9 2.5l5.1-5.1C32.7 7.6 28.6 6 24 6c-6.5 0-12.1 3.6-15.3 8.7z"/>
+          <path fill="#4CAF50" d="M24 42c4.5 0 8.6-1.5 11.8-4.2l-5.5-4.5c-1.9 1.3-4.3 2.1-6.3 2.1-5.3 0-9.7-3-11.3-7.2l-5.9 4.5C9.9 38.3 16.4 42 24 42z"/>
+          <path fill="#1976D2" d="M43.6 20.5H42V20.4H24v7.2h11.3c-.8 2.4-2.4 4.4-4.5 5.8l5.5 4.5C39.7 35.5 42 30.2 42 24c0-1.2-.1-2.4-.4-3.5z"/>
+        </svg>
+        <span>Đăng nhập với Google</span>
+      </button>
+    </div>
+
+    <div id="startOverlay">
+      <div class="start-orb"></div>
+      <button id="startBtn">Bấm để bắt đầu</button>
+    </div>
+  </div>
+
+  <audio id="bgAudio" src="https://res.cloudinary.com/dlrax6e5x/video/upload/v1788422190/nlrxi1nzrxs0czncdwto.mp3" preload="auto"></audio>
+
+<script>
+  const startOverlay = document.getElementById('startOverlay');
+  const startBtn = document.getElementById('startBtn');
+  const introOrb = document.getElementById('introOrb');
+  const gradientBg = document.getElementById('gradientBg');
+  const logoWrap = document.getElementById('logoWrap');
+  const headline = document.getElementById('headline');
+  const nextBtn = document.getElementById('nextBtn');
+  const stage = document.getElementById('stage');
+  const audio = document.getElementById('bgAudio');
+
+  const EXPAND_AT   = 5200;   // orb -> full-screen gradient + logo in
+  const SWAP_AT     = 8000;   // logo -> headline words
+  const WORDS_DUR   = 900;    // time for the last word to finish rising
+  const BTN_AFTER   = 250;    // extra pause before the arrow button appears
+
+  // ---------- Phase 2: flowing blob field ----------
+  const blobField = document.getElementById('blobField');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const BLOB_COLORS = [
+    '#0B1F6B', '#141B8C', '#1E2FAE', '#3139FB', '#0047FF',
+    '#2C6FF0', '#3D8BFF', '#5EC8FF', '#00B8D4', '#FF3333'
+  ];
+  const RED_INDEX = BLOB_COLORS.length - 1;
+  const MAX_BLOBS = 7;
+  let blobFieldRunning = false;
+
+  function rand(min, max){ return Math.random() * (max - min) + min; }
+
+  function pickColor(){
+    // red is a rare accent (~1 in 9 picks)
+    if (Math.random() < 0.11) return BLOB_COLORS[RED_INDEX];
+    return BLOB_COLORS[Math.floor(rand(0, RED_INDEX))];
+  }
+
+  function spawnBlob(initialDelay, seedProgress){
+    if (!blobFieldRunning) return;
+
+    const el = document.createElement('div');
+    el.className = 'flow-blob';
+
+    const size = rand(38, 70);          // vmax
+    const startX = rand(-10, 110);       // vw
+    const startY = rand(-10, 110);       // vh
+    const angle = rand(0, 360) * Math.PI / 180;
+    const travel = rand(85, 130);        // vmax
+    const dx = Math.cos(angle) * travel;
+    const dy = Math.sin(angle) * travel;
+    const duration = rand(8000, 15000);
+    const peakOpacity = rand(.55, .85);
+
+    el.style.width = size + 'vmax';
+    el.style.height = size + 'vmax';
+    el.style.left = startX + 'vw';
+    el.style.top = startY + 'vh';
+    el.style.background = pickColor();
+
+    blobField.appendChild(el);
+
+    const run = () => {
+      const anim = el.animate([
+        { transform:'translate(-50%,-50%) translate(0,0) scale(.55)', opacity:0 },
+        { transform:'translate(-50%,-50%) translate(0,0) scale(1)', opacity:peakOpacity, offset:.18 },
+        { transform:`translate(-50%,-50%) translate(${dx}vmax,${dy}vmax) scale(1.1)`, opacity:peakOpacity, offset:.82 },
+        { transform:`translate(-50%,-50%) translate(${dx*1.18}vmax,${dy*1.18}vmax) scale(1.18)`, opacity:0 }
+      ], { duration, easing:'ease-in-out', fill:'forwards' });
+
+      // seed some blobs already mid-flight so the reveal doesn't look empty
+      if (seedProgress) anim.currentTime = duration * seedProgress;
+
+      anim.onfinish = () => {
+        el.remove();
+        if (blobFieldRunning) spawnBlob(0);
+      };
+    };
+
+    if (initialDelay) setTimeout(run, initialDelay);
+    else run();
+  }
+
+  function startBlobField(){
+    if (reduceMotion || blobFieldRunning) return;
+    blobFieldRunning = true;
+
+    const SEEDED = 3; // blobs that appear already mid-flight right at reveal
+    for (let i = 0; i < SEEDED; i++){
+      spawnBlob(0, rand(0.25, 0.6));
+    }
+    for (let i = SEEDED; i < MAX_BLOBS; i++){
+      spawnBlob(rand(0, 3000)); // stagger the rest so it fills in gradually
+    }
+  }
+
+  startBtn.addEventListener('click', () => {
+    startOverlay.classList.add('hide');
+
+    audio.currentTime = 0;
+    audio.play().catch(()=>{});
+
+    // Phase 1: blended colors breathing on black
+    introOrb.classList.add('breathe');
+
+    // Phase 2: expand + reveal animated gradient + logo rises in
+    setTimeout(() => {
+      introOrb.classList.remove('breathe');
+      introOrb.classList.add('fadeout');
+
+      gradientBg.classList.add('reveal');
+      gradientBg.classList.add('animate');
+      startBlobField();
+
+      logoWrap.classList.add('show');
+    }, EXPAND_AT);
+
+    // Phase 3: logo out, headline words rise in one by one
+    setTimeout(() => {
+      logoWrap.classList.remove('show');
+      logoWrap.classList.add('hide');
+      headline.classList.add('show');
+
+      // arrow button appears only after the words finish rising
+      setTimeout(() => {
+        headline.classList.add('show-btn');
+      }, WORDS_DUR + BTN_AFTER);
+    }, SWAP_AT);
+  });
+
+  const loginScreen = document.getElementById('loginScreen');
+  const googleBtn = document.getElementById('googleBtn');
+
+  nextBtn.addEventListener('click', () => {
+    headline.classList.remove('show', 'show-btn');
+    loginScreen.classList.add('show');
+  });
+
+  googleBtn.addEventListener('click', () => {
+    // TODO: gọi supabase.auth.signInWithOAuth({ provider: 'google' })
+  });
+</script>
+
+</body>
+</html>
