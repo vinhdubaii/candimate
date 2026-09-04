@@ -285,7 +285,8 @@ body.dark .sb-sr-item:hover { background: rgba(255,255,255,.07); }
   position: fixed;
   top: var(--sb-gap); bottom: var(--sb-gap);
   left: calc(var(--sb-gap) * 2 + var(--sb-w));
-  width: 340px;
+  right: var(--sb-gap);
+  width: auto;
   padding: 22px 20px;
   z-index: 480; /* thấp hơn sidebar (500) để không đè lên */
 
@@ -300,7 +301,7 @@ body.dark .sb-sr-item:hover { background: rgba(255,255,255,.07); }
   display: none;
 }
 .settings-popup.open { display: block; } /* không animation, hiện tức thì */
-body.sidebar-right .settings-popup { left: auto; right: calc(var(--sb-gap) * 2 + var(--sb-w)); }
+body.sidebar-right .settings-popup { left: var(--sb-gap); right: calc(var(--sb-gap) * 2 + var(--sb-w)); }
 
 /* ═══════════════════════════════
    ACCOUNT PANEL — dùng chung khung .settings-popup
@@ -319,51 +320,13 @@ body.sidebar-right .settings-popup { left: auto; right: calc(var(--sb-gap) * 2 +
 .account-fav-list .fav-day-heading { padding: 14px 0 8px; font-size: 11px; }
 .account-fav-list .fav-day-heading:first-child { padding-top: 0; }
 .account-fav-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px;
 }
 .account-fav-grid .photo-card { margin-bottom: 0; aspect-ratio: 1 / 1; border-radius: 8px; }
 .account-fav-empty { font-size: 13px; color: var(--muted); line-height: 1.6; padding: 10px 0 4px; }
 
-/* ═══════════════════════════════
-   SETTINGS TRIGGER — nút tròn góc trên-phải, hover hiện nhãn "Settings"
-═══════════════════════════════ */
-.topright-settings-btn {
-  position: fixed;
-  top: var(--sb-gap); right: var(--sb-gap);
-  z-index: 490;
-  height: 40px;
-  min-width: 40px;
-  padding: 0;
-  border: none; border-radius: 999px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  color: var(--muted);
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  overflow: hidden;
-  transition: color .18s, padding .22s ease, min-width .22s ease;
-}
-.topright-settings-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
-.topright-settings-btn .topright-settings-label {
-  font-size: 13px; font-weight: 600; white-space: nowrap;
-  max-width: 0; opacity: 0; overflow: hidden;
-  transition: max-width .22s ease, opacity .18s ease;
-}
-.topright-settings-btn:hover,
-.topright-settings-btn.active {
-  color: var(--text);
-  padding: 0 16px 0 14px;
-}
-.topright-settings-btn:hover .topright-settings-label,
-.topright-settings-btn.active .topright-settings-label {
-  max-width: 80px; opacity: 1;
-}
-body.sidebar-right .topright-settings-btn { right: auto; left: var(--sb-gap); }
-
 .settings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.settings-header-actions { display: flex; align-items: center; gap: 8px; }
 .settings-close-btn {
   width: 30px; height: 30px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -378,6 +341,12 @@ body.dark .settings-close-btn { background: rgba(255,255,255,.08); }
 .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .settings-row + .settings-row { margin-top: 12px; }
 .settings-row label { font-size: 13px; color: var(--text); cursor: pointer; }
+
+.settings-toggles-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  column-gap: 28px; row-gap: 12px;
+}
+.settings-toggles-grid .settings-row { margin-top: 0; }
 
 /* Toggle switch */
 .toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
@@ -408,6 +377,16 @@ body.dark .toggle-track { background: rgba(255,255,255,.2); }
 .settings-about-link:hover { background: rgba(0,0,0,.05); color: var(--text); }
 body.dark .settings-about-link:hover { background: rgba(255,255,255,.08); }
 .settings-about-link svg:last-child { margin-left: auto; opacity: .5; }
+
+.settings-logout-btn {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  margin-top: 4px; padding: 9px 10px; border-radius: 10px;
+  border: none; background: none; cursor: pointer;
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  color: #e0525c;
+  transition: background .2s;
+}
+.settings-logout-btn:hover { background: rgba(224,82,92,.12); }
 .settings-album-title { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 .settings-album-item {
   display: flex; align-items: center; gap: 8px;
@@ -424,7 +403,7 @@ body.dark .settings-album-item:hover { background: rgba(255,255,255,.08); }
 /* ═══════════════════════════════
    WALLPAPER PICKER (trong Settings)
 ═══════════════════════════════ */
-.wallpaper-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.wallpaper-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
 .wallpaper-item {
   position: relative; aspect-ratio: 4/3; border-radius: 10px; overflow: hidden;
   cursor: pointer; border: 2px solid transparent; background: rgba(0,0,0,.15);
@@ -581,7 +560,9 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
 .gallery {
   columns: 4 220px; column-gap: 12px;
   padding: 8px 32px 32px;
+  transition: opacity .15s ease;
 }
+body.panel-open .gallery { opacity: 0; pointer-events: none; }
 .photo-card {
   break-inside: avoid; margin-bottom: 12px; border-radius: 14px; overflow: hidden;
   cursor: pointer; position: relative;
@@ -913,8 +894,6 @@ body.dark .music-track:hover { background: rgba(255,255,255,.07); }
   .top-searchbar-wrap { margin: 18px auto 12px; }
 
   #rightsb-row   { display: none; }
-  .topright-settings-btn { top: calc(var(--sb-gap)); height: 36px; min-width: 36px; }
-  .topright-settings-btn svg { width: 18px; height: 18px; }
   .gallery       { padding: 8px 12px 24px; columns: 2 140px; }
   .album-header  { padding: 20px 16px 10px; }
   .album-divider { margin: 0 16px 8px; }

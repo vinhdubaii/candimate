@@ -877,10 +877,13 @@ document.addEventListener('keydown', e => {
 /* ══════════════════════════════════════
    SETTINGS DRAWER — mép trái, KHÔNG animation
 ══════════════════════════════════════ */
+function _syncPanelBgVisibility() {
+  document.body.classList.toggle('panel-open', settingsOpen || accountOpen);
+}
+
 function toggleSettings() {
   settingsOpen = !settingsOpen;
   $('settings-popup').classList.toggle('open', settingsOpen);
-  $('topright-settings-btn')?.classList.toggle('active', settingsOpen);
   if (settingsOpen) {
     closeAllModals();
     closeAccountPanel();
@@ -888,11 +891,12 @@ function toggleSettings() {
   } else {
     if (autoHideEnabled && !$('sidebar')?.matches(':hover')) scheduleHideSidebar();
   }
+  _syncPanelBgVisibility();
 }
 function closeSettings() {
   settingsOpen = false;
   $('settings-popup')?.classList.remove('open');
-  $('topright-settings-btn')?.classList.remove('active');
+  _syncPanelBgVisibility();
 }
 
 /* ══════════════════════════════════════
@@ -910,11 +914,18 @@ function toggleAccountPanel() {
   } else {
     if (autoHideEnabled && !$('sidebar')?.matches(':hover')) scheduleHideSidebar();
   }
+  _syncPanelBgVisibility();
 }
 function closeAccountPanel() {
   accountOpen = false;
   $('account-popup')?.classList.remove('open');
   $('sb-account')?.classList.remove('active');
+  _syncPanelBgVisibility();
+}
+// Icon bánh răng trong panel Account -> chuyển sang panel Settings
+function switchToSettingsPanel() {
+  closeAccountPanel();
+  if (!settingsOpen) toggleSettings();
 }
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -922,8 +933,8 @@ function scrollToTop() {
 }
 
 document.addEventListener('click', e => {
-  const popup = $('settings-popup'), settBtn = $('topright-settings-btn');
-  if (settingsOpen && !popup?.contains(e.target) && !settBtn?.contains(e.target)) {
+  const popup = $('settings-popup'), gearBtn = $('account-settings-gear');
+  if (settingsOpen && !popup?.contains(e.target) && !gearBtn?.contains(e.target)) {
     closeSettings();
     if (autoHideEnabled && !$('sidebar')?.matches(':hover')) scheduleHideSidebar();
   }
