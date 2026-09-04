@@ -74,7 +74,15 @@ export async function onRequest(context) {
     return Response.redirect(url.origin + '/', 302);
   }
 
-  // Chưa đăng nhập mà vào bất cứ đâu ngoài các path public -> đá về welcome.html
+  // Chưa đăng nhập mà vào trang gốc "/" -> phục vụ TRỰC TIẾP nội dung welcome.html
+  // (status 200, không redirect) để Googlebot/Search Console thấy nội dung + thẻ
+  // verification ngay tại domain gốc, đồng thời URL hiển thị trên trình duyệt vẫn
+  // giữ nguyên "/" (không nhảy sang /welcome.html).
+  if (!isAuthed && pathname === '/') {
+    return next(new Request(url.origin + '/welcome.html', request));
+  }
+
+  // Chưa đăng nhập mà vào bất cứ đâu khác ngoài các path public -> đá về welcome.html
   if (!isAuthed && !isPublicPath(pathname)) {
     return Response.redirect(url.origin + '/welcome.html', 302);
   }
