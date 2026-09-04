@@ -320,9 +320,9 @@ body.sidebar-right .settings-popup { left: var(--sb-gap); right: calc(var(--sb-g
 .account-fav-list .fav-day-heading { padding: 14px 0 8px; font-size: 11px; }
 .account-fav-list .fav-day-heading:first-child { padding-top: 0; }
 .account-fav-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px;
+  columns: 3 180px; column-gap: 10px;
 }
-.account-fav-grid .photo-card { margin-bottom: 0; aspect-ratio: 1 / 1; border-radius: 8px; }
+.account-fav-grid .photo-card { break-inside: avoid; margin-bottom: 10px; border-radius: 10px; }
 .account-fav-empty { font-size: 13px; color: var(--muted); line-height: 1.6; padding: 10px 0 4px; }
 
 .settings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }

@@ -1173,7 +1173,6 @@ function renderAccountBookmarks() {
       const card = makeCard(item.p, globalIdx, () => {
         filtered   = flatForLb;
         currentIdx = idxForThisCard;
-        closeAccountPanel();
         openLb();
       });
       grid.appendChild(card);
