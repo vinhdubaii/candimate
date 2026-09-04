@@ -108,6 +108,46 @@
     transform:translateY(0px) scale(.97);
   }
 
+  /* ---------- MADE BY FOOTER (đáy màn hình check bot) ---------- */
+  #madeByFooter{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:28px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+  }
+  .made-by-label{
+    font-size:12px;
+    font-weight:500;
+    color:rgba(255,250,221,.5);
+    letter-spacing:.02em;
+  }
+  .made-by-link{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    color:var(--cream);
+    font-size:13px;
+    font-weight:700;
+    opacity:.85;
+    transition:opacity .2s ease;
+  }
+  .made-by-link:hover{
+    opacity:1;
+  }
+  .made-by-avatar{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    display:block;
+    object-fit:cover;
+    box-shadow:0 0 0 1px rgba(255,250,221,.25);
+  }
+
   /* ---------- PHASE 1: blended breathing orb ---------- */
   #introOrb{
     position:absolute;
@@ -439,6 +479,14 @@
            data-expired-callback="onTurnstileExpired"
            data-error-callback="onTurnstileExpired"></div>
       <button id="startBtn">Bấm để bắt đầu</button>
+
+      <div id="madeByFooter">
+        <span class="made-by-label">Made by</span>
+        <a href="https://github.com/vinhdubaii" target="_blank" rel="noopener noreferrer" class="made-by-link">
+          <img src="https://github.com/Vinhdubaii.png" alt="Vinhdubaii" class="made-by-avatar">
+          <span>Vinhdubaii</span>
+        </a>
+      </div>
     </div>
   </div>
 
