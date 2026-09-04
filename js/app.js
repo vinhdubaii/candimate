@@ -933,6 +933,10 @@ function scrollToTop() {
 }
 
 document.addEventListener('click', e => {
+  // Click bên trong lightbox (kể cả nền đen backdrop) không tính là "click ra ngoài" panel —
+  // lightbox nổi trên panel nên tương tác trong đó không nên làm đóng panel phía sau.
+  if ($('lightbox')?.contains(e.target)) return;
+
   const popup = $('settings-popup'), gearBtn = $('account-settings-gear');
   if (settingsOpen && !popup?.contains(e.target) && !gearBtn?.contains(e.target)) {
     closeSettings();
