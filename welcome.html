@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
   :root{
     --red:#FF3333;
@@ -64,6 +65,14 @@
     0%,100%{transform:scale(1);}
     50%{transform:scale(1.15);}
   }
+  #turnstileHeading{
+    color:var(--cream);
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:.02em;
+    text-align:center;
+    opacity:.9;
+  }
   #startBtn{
     font-family:inherit;
     font-size:15px;
@@ -75,7 +84,15 @@
     border-radius:999px;
     padding:13px 28px;
     cursor:pointer;
-    transition:transform .25s ease, box-shadow .25s ease;
+    opacity:0;
+    transform:translateY(6px) scale(.96);
+    pointer-events:none;
+    transition:opacity .35s ease, transform .35s ease, box-shadow .25s ease;
+  }
+  #startBtn.ready{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    pointer-events:auto;
   }
   #startBtn:hover{
     transform:translateY(-2px);
@@ -407,7 +424,14 @@
     </div>
 
     <div id="startOverlay">
-      <div class="start-orb"></div>
+      <div id="turnstileHeading">Confirm You're Not a Bot</div>
+      <div class="cf-turnstile"
+           id="cfTurnstileWidget"
+           data-sitekey="0x4AAAAAAEmfYUxpHgUZDomF"
+           data-theme="dark"
+           data-callback="onTurnstileVerified"
+           data-expired-callback="onTurnstileExpired"
+           data-error-callback="onTurnstileExpired"></div>
       <button id="startBtn">Bấm để bắt đầu</button>
     </div>
   </div>
@@ -424,6 +448,32 @@
 
   const startOverlay = document.getElementById('startOverlay');
   const startBtn = document.getElementById('startBtn');
+
+  // Cloudflare Turnstile gọi hàm này (qua data-callback) kèm token khi user pass check.
+  // Không tin token mù quáng — gửi lên Pages Function để verify thật với Cloudflare trước khi mở khoá nút.
+  function onTurnstileVerified(token) {
+    fetch('/api/verify-turnstile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          startBtn.classList.add('ready');
+        } else if (window.turnstile) {
+          turnstile.reset('#cfTurnstileWidget');
+        }
+      })
+      .catch(() => {
+        if (window.turnstile) turnstile.reset('#cfTurnstileWidget');
+      });
+  }
+  // Token hết hạn hoặc lỗi -> khoá lại nút, bắt check lại.
+  function onTurnstileExpired() {
+    startBtn.classList.remove('ready');
+  }
+
   const introOrb = document.getElementById('introOrb');
   const gradientBg = document.getElementById('gradientBg');
   const logoWrap = document.getElementById('logoWrap');
