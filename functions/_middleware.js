@@ -12,11 +12,14 @@
 // (để màn hình welcome/login còn load được).
 const PUBLIC_EXACT = new Set([
   '/welcome.html',
+  '/policies.html',
   '/manifest.json',
   '/favicon.png',
   '/darkmode-icon.png',
   '/lightmode-icon.png',
   '/sw.js',
+  '/robots.txt',
+  '/sitemap.xml',
   '/api/verify-turnstile', // gọi từ welcome.html lúc CHƯA đăng nhập -> phải public
 ]);
 

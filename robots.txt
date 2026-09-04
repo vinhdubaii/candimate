@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /welcome.html
+Allow: /policies.html
+Allow: /manifest.json
+Allow: /icons/
+Allow: /favicon.png
+Allow: /darkmode-icon.png
+Allow: /lightmode-icon.png
+
+# Các trang bên trong yêu cầu đăng nhập (kỷ yếu ảnh của Trường THPT Lộc Hiệp)
+# không dành để index công khai vì lý do quyền riêng tư của học sinh, giáo viên.
+Disallow: /
+
+Sitemap: https://candimate.pages.dev/sitemap.xml
