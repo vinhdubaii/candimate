@@ -53,6 +53,12 @@ async function verifyToken(accessToken, supabaseUrl, anonKey) {
   }
 }
 
+function withNoStore(res) {
+  const newRes = new Response(res.body, res);
+  newRes.headers.set('Cache-Control', 'private, no-store, must-revalidate');
+  return newRes;
+}
+
 export async function onRequest(context) {
   const { request, env, next } = context;
   const url = new URL(request.url);
@@ -79,7 +85,8 @@ export async function onRequest(context) {
   // verification ngay tại domain gốc, đồng thời URL hiển thị trên trình duyệt vẫn
   // giữ nguyên "/" (không nhảy sang /welcome.html).
   if (!isAuthed && pathname === '/') {
-    return next(new Request(url.origin + '/welcome.html', request));
+    const res = await next(new Request(url.origin + '/welcome.html', request));
+    return withNoStore(res); // nội dung phụ thuộc trạng thái đăng nhập -> KHÔNG cho CDN cache chung
   }
 
   // Chưa đăng nhập mà vào bất cứ đâu khác ngoài các path public -> đá về welcome.html
@@ -87,5 +94,15 @@ export async function onRequest(context) {
     return Response.redirect(url.origin + '/welcome.html', 302);
   }
 
-  return next();
+  const res = await next();
+
+  // Mọi trang KHÔNG nằm trong danh sách public (tức là chỉ phục vụ khi đã xác thực,
+  // ví dụ index.html, dữ liệu album...) tuyệt đối không được để Cloudflare cache theo
+  // URL — nếu không, một request đã đăng nhập có thể bị cache và trả về công khai cho
+  // người dùng/bot khác sau đó, làm lộ ảnh học sinh, giáo viên.
+  if (!isPublicPath(pathname)) {
+    return withNoStore(res);
+  }
+
+  return res;
 }
