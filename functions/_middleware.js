@@ -83,9 +83,14 @@ export async function onRequest(context) {
   // Chưa đăng nhập mà vào trang gốc "/" -> phục vụ TRỰC TIẾP nội dung welcome.html
   // (status 200, không redirect) để Googlebot/Search Console thấy nội dung + thẻ
   // verification ngay tại domain gốc, đồng thời URL hiển thị trên trình duyệt vẫn
-  // giữ nguyên "/" (không nhảy sang /welcome.html).
+  // giữ nguyên "/" (không nhảy sang /welcome.html hay /welcome).
+  //
+  // Lưu ý: dùng env.ASSETS.fetch() thay vì next(new Request(...)) — vì next() vẫn đi
+  // qua lớp routing mặc định của Cloudflare Pages, lớp này tự động redirect .html
+  // sang URL không đuôi ("clean URLs"), khiến trình duyệt vẫn bị nhảy URL sang /welcome.
+  // env.ASSETS.fetch() lấy thẳng nội dung file tĩnh theo đúng path, bỏ qua lớp đó.
   if (!isAuthed && pathname === '/') {
-    const res = await next(new Request(url.origin + '/welcome.html', request));
+    const res = await env.ASSETS.fetch(new Request(url.origin + '/welcome.html', request));
     return withNoStore(res); // nội dung phụ thuộc trạng thái đăng nhập -> KHÔNG cho CDN cache chung
   }
 
