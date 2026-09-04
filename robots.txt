@@ -1,4 +1,5 @@
 User-agent: *
+Allow: /$
 Allow: /welcome.html
 Allow: /policies.html
 Allow: /manifest.json
