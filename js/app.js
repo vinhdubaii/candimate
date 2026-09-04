@@ -71,6 +71,7 @@ let albumData   = {};    // { albumId: [photos] }
 let allPhotos   = [];    // toàn bộ ảnh của năm hiện tại, đã shuffle
 let filtered    = [];    // context cho lightbox: [{ p, albumId, albumMeta }]
 let currentIdx  = 0;
+let currentOpenAlbumId = null; // id album đang xem chi tiết, null = đang ở Home/Albums grid
 
 /* ══════════════════════════════════════
    DATA LOADING
@@ -234,6 +235,7 @@ function makeCard(p, i, onClickFn) {
    HOME — ảnh random, không chia album
 ══════════════════════════════════════ */
 function buildHomeGallery() {
+  currentOpenAlbumId = null;
   $('sb-home')?.classList.add('active');
   $('sb-albums')?.classList.remove('active');
 
@@ -333,6 +335,7 @@ function buildTopSearchBar() {
    ALBUMS PAGE — danh sách album
 ══════════════════════════════════════ */
 function openAlbumsPage() {
+  currentOpenAlbumId = null;
   $('sb-albums')?.classList.add('active');
   $('sb-home')?.classList.remove('active');
 
@@ -409,6 +412,7 @@ function openAlbumsPage() {
 ══════════════════════════════════════ */
 function openAlbumView(albumMeta) {
   const id     = albumFileToId(albumMeta.file);
+  currentOpenAlbumId = id;
   const photos = albumData[id] || [];
   const container = $('albums-container');
   if (!container) return;
@@ -466,6 +470,157 @@ function openAlbumView(albumMeta) {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+/* ══════════════════════════════════════
+   SLIDESHOW — overlay riêng, KHÔNG dùng chung #lightbox
+   - Home (chưa mở album nào)  → random toàn bộ allPhotos
+   - Đang mở 1 album cụ thể    → chỉ ảnh trong album đó, có progress bar
+     kiểu Story (Facebook), chạy tuần tự theo thứ tự trong album
+══════════════════════════════════════ */
+let ssPhotos      = [];   // [{ p, albumMeta }]
+let ssIndex       = 0;
+let ssTimer       = null;
+let ssPaused      = false;
+let ssHasProgress = false; // true = đang xem 1 album cụ thể → hiện progress bar
+const SS_DURATION  = 5000; // 5s / ảnh
+
+function shuffleCopy(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startSlideshow() {
+  if (currentOpenAlbumId) {
+    // Đang xem 1 album cụ thể → chỉ lấy ảnh trong album đó, giữ thứ tự gốc (giống Story)
+    const meta   = ALBUMS.find(a => albumFileToId(a.file) === currentOpenAlbumId);
+    const photos = albumData[currentOpenAlbumId] || [];
+    if (!photos.length) return;
+    ssPhotos      = photos.map(p => ({ p, albumMeta: meta }));
+    ssHasProgress = true;
+  } else {
+    // Home / Albums grid → random toàn bộ ảnh của năm hiện tại
+    if (!allPhotos.length) return;
+    ssPhotos      = shuffleCopy(allPhotos.map(({ p, albumMeta }) => ({ p, albumMeta })));
+    ssHasProgress = false;
+  }
+
+  ssIndex  = 0;
+  ssPaused = false;
+  setSsPlayIcon(true);
+  buildSsProgress();
+  updateSsImg();
+  $('slideshow-overlay')?.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  runSsSegment();
+}
+
+function closeSlideshow() {
+  clearTimeout(ssTimer);
+  $('slideshow-overlay')?.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function updateSsImg() {
+  const item = ssPhotos[ssIndex]; if (!item) return;
+  const img = $('ss-img'); if (!img) return;
+  img.style.animation = 'none'; img.offsetHeight; img.style.animation = 'zoomIn .25s ease';
+  img.src = item.p.full || item.p.url;
+  img.alt = item.p.name;
+}
+
+/* ── Progress bar kiểu Story (chỉ khi ssHasProgress = true) ── */
+function buildSsProgress() {
+  const wrap = $('ss-progress-wrap'); if (!wrap) return;
+  wrap.innerHTML = '';
+  wrap.style.display = ssHasProgress ? 'flex' : 'none';
+  if (!ssHasProgress) return;
+  ssPhotos.forEach(() => {
+    const seg  = document.createElement('div');
+    seg.className = 'ss-progress-seg';
+    const fill = document.createElement('div');
+    fill.className = 'ss-progress-seg-fill';
+    seg.appendChild(fill);
+    wrap.appendChild(seg);
+  });
+}
+function ssSegFills() {
+  return $('ss-progress-wrap')?.querySelectorAll('.ss-progress-seg-fill') || [];
+}
+/* Đặt lại trạng thái các đoạn: đã qua = đầy, hiện tại = 0% (sẵn sàng chạy), sau = 0% */
+function resetSsProgressState() {
+  if (!ssHasProgress) return;
+  const fills = ssSegFills();
+  fills.forEach((fill, i) => {
+    fill.style.transition = 'none';
+    fill.style.width = i < ssIndex ? '100%' : '0%';
+  });
+}
+
+/* ── Chạy 1 đoạn 5s cho ảnh hiện tại, rồi tự chuyển ảnh kế tiếp ── */
+function runSsSegment() {
+  clearTimeout(ssTimer);
+  resetSsProgressState();
+  if (ssPaused) return;
+
+  if (ssHasProgress) {
+    const fill = ssSegFills()[ssIndex];
+    if (fill) {
+      requestAnimationFrame(() => {
+        fill.style.transition = `width ${SS_DURATION}ms linear`;
+        fill.style.width = '100%';
+      });
+    }
+  }
+  ssTimer = setTimeout(() => slideshowNav(1), SS_DURATION);
+}
+
+/* dir: -1 (lùi) / 1 (tiến) — dùng chung cho cả tự động lẫn bấm tay,
+   luôn reset lại đồng hồ 5s từ ảnh mới */
+function slideshowNav(dir) {
+  ssIndex = (ssIndex + dir + ssPhotos.length) % ssPhotos.length;
+  updateSsImg();
+  runSsSegment();
+}
+
+function toggleSlideshowPause() {
+  ssPaused = !ssPaused;
+  setSsPlayIcon(!ssPaused);
+  if (ssPaused) {
+    clearTimeout(ssTimer);
+    // Đóng băng đúng % đang chạy dở (không reset về 0, không nhảy 100%)
+    if (ssHasProgress) {
+      const fill = ssSegFills()[ssIndex];
+      if (fill) {
+        const frozenWidth = getComputedStyle(fill).width;
+        fill.style.transition = 'none';
+        fill.style.width = frozenWidth;
+      }
+    }
+  } else {
+    runSsSegment();
+  }
+}
+
+function setSsPlayIcon(isPlaying) {
+  const pauseIcon = $('ss-icon-pause'), playIcon = $('ss-icon-play');
+  if (pauseIcon) pauseIcon.style.display = isPlaying ? 'block' : 'none';
+  if (playIcon)  playIcon.style.display  = isPlaying ? 'none'  : 'block';
+}
+
+/* ESC đóng slideshow (mọi thiết bị). Nút ✕ chỉ hiện trên mobile qua CSS. */
+document.addEventListener('keydown', e => {
+  if (!$('slideshow-overlay')?.classList.contains('active')) return;
+  if (e.key === 'Escape')     closeSlideshow();
+  if (e.key === 'ArrowLeft')  slideshowNav(-1);
+  if (e.key === 'ArrowRight') slideshowNav(1);
+});
+$('slideshow-overlay')?.addEventListener('click', e => {
+  if (e.target.id === 'slideshow-overlay') closeSlideshow();
+});
 
 /* ══════════════════════════════════════
    LIGHTBOX + PRELOAD

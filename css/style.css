@@ -661,6 +661,78 @@ body.panel-open .gallery { opacity: 0; pointer-events: none; }
 
 
 /* ═══════════════════════════════
+   SLIDESHOW OVERLAY (độc lập với #lightbox)
+═══════════════════════════════ */
+#slideshow-overlay {
+  display: none; position: fixed; inset: 0; z-index: 1100;
+  background: #000;
+  align-items: center; justify-content: center;
+  animation: fadeIn .2s ease;
+}
+#slideshow-overlay.active { display: flex; }
+
+.ss-img-wrap { max-width: 94vw; max-height: 94vh; display: flex; align-items: center; justify-content: center; }
+#ss-img {
+  max-width: 94vw; max-height: 94vh; object-fit: contain;
+  border-radius: 6px;
+  animation: zoomIn .25s ease;
+  user-select: none; -webkit-user-drag: none;
+}
+
+/* Progress bar kiểu Story — chỉ hiện khi slideshow đang chạy trong 1 album cụ thể */
+.ss-progress-wrap {
+  display: none;
+  position: absolute; top: 14px; left: 14px; right: 60px; z-index: 2;
+  gap: 4px;
+}
+.ss-progress-seg {
+  flex: 1; height: 3px; border-radius: 3px;
+  background: rgba(255,255,255,.28); overflow: hidden;
+}
+.ss-progress-seg-fill { height: 100%; width: 0%; background: #fff; border-radius: 3px; }
+
+/* Play/Pause — góc trên-phải, cùng hàng với progress bar */
+.ss-playpause-btn {
+  position: absolute; top: 12px; right: 14px; z-index: 2;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.2);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; backdrop-filter: blur(8px); transition: background .2s;
+}
+.ss-playpause-btn:hover { background: rgba(255,255,255,.28); }
+
+/* Nút đóng (X) — chỉ hiện trên mobile, desktop dùng ESC */
+.ss-close-btn {
+  display: none;
+  position: absolute; top: 12px; left: 14px; z-index: 2;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.2);
+  color: #fff; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 14px; backdrop-filter: blur(8px);
+}
+
+/* Nút tiến/lùi — cố định 2 mép trái/phải màn hình */
+.ss-nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+  width: 46px; height: 46px; border-radius: 50%;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+  backdrop-filter: blur(8px); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 20px; transition: all .2s;
+}
+.ss-nav:hover { background: var(--accent); border-color: var(--accent); }
+.ss-prev { left: 18px; }
+.ss-next { right: 18px; }
+
+@media (max-width: 768px) {
+  .ss-close-btn { display: flex; }
+  .ss-nav { width: 40px; height: 40px; font-size: 18px; }
+  .ss-prev { left: 8px; }
+  .ss-next { right: 8px; }
+}
+
+
+/* ═══════════════════════════════
    ALBUM BACK BUTTON
 ═══════════════════════════════ */
 .album-back-btn {

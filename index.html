@@ -37,6 +37,10 @@
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
   </button>
 
+  <button class="sb-btn" id="sb-slideshow" title="Slideshow ngẫu nhiên" onclick="startSlideshow()">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+  </button>
+
   <div class="sb-spacer"></div>
 
   <a class="sb-btn sb-upload-btn" id="sb-upload" title="Upload ảnh" href="https://tally.so/r/xXZWEJ" target="_blank" rel="noopener">
@@ -222,6 +226,24 @@
       </button>
     </a>
   </div>
+</div>
+
+<!-- SLIDESHOW OVERLAY (độc lập với #lightbox) -->
+<div id="slideshow-overlay">
+  <div class="ss-progress-wrap" id="ss-progress-wrap"></div>
+
+  <button class="ss-close-btn" id="ss-close-btn" onclick="closeSlideshow()" title="Đóng">✕</button>
+
+  <button class="ss-playpause-btn" id="ss-playpause-btn" onclick="toggleSlideshowPause()" title="Phát/Dừng">
+    <svg id="ss-icon-pause" width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+    <svg id="ss-icon-play" width="15" height="15" fill="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M9 4l12 8-12 8V4z"/></svg>
+  </button>
+
+  <button class="ss-nav ss-prev" onclick="slideshowNav(-1)" title="Ảnh trước">‹</button>
+  <div class="ss-img-wrap">
+    <img id="ss-img" src="" alt=""/>
+  </div>
+  <button class="ss-nav ss-next" onclick="slideshowNav(1)" title="Ảnh tiếp">›</button>
 </div>
 
 <audio id="bg-audio" loop></audio>
