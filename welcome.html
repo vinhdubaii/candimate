@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Welcome</title>
+<link rel="icon" type="image/png" href="/icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
@@ -53,6 +54,11 @@
   #startOverlay.hide{
     opacity:0;
     pointer-events:none;
+  }
+  /* Khoá cứng mọi phần tử con (kể cả startBtn.ready tự bật pointer-events
+     riêng) để không đè và chặn click của các nút phía sau, ví dụ #nextBtn. */
+  #startOverlay.hide *{
+    pointer-events:none !important;
   }
   .start-orb{
     width:64px;height:64px;border-radius:50%;
@@ -565,6 +571,14 @@
   }
 
   startBtn.addEventListener('click', () => {
+    // Tắt hẳn tương tác của startBtn ngay lập tức: class "ready" tự set
+    // pointer-events:auto trên chính nó, nên riêng pointer-events:none của
+    // #startOverlay.hide (ở phần tử cha) không đủ để chặn click xuyên qua nó.
+    // Nếu không gỡ ở đây, nút này vẫn "vô hình nhưng bấm được" và đè lên
+    // đúng vị trí của #nextBtn ở màn hình sau, khiến bấm mũi tên lại chạy
+    // nhầm handler của startBtn (phát lại audio) thay vì mở màn đăng nhập.
+    startBtn.classList.remove('ready');
+    startBtn.disabled = true;
     startOverlay.classList.add('hide');
 
     audio.currentTime = 0;
