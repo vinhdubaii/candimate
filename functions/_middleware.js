@@ -17,6 +17,7 @@ const PUBLIC_EXACT = new Set([
   '/darkmode-icon.png',
   '/lightmode-icon.png',
   '/sw.js',
+  '/api/verify-turnstile', // gọi từ welcome.html lúc CHƯA đăng nhập -> phải public
 ]);
 
 const PUBLIC_PREFIXES = [
