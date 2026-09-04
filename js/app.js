@@ -530,6 +530,23 @@ function updateSsImg() {
   img.style.animation = 'none'; img.offsetHeight; img.style.animation = 'zoomIn .25s ease';
   img.src = item.p.full || item.p.url;
   img.alt = item.p.name;
+  preloadSsAround(ssIndex);
+}
+
+/* Preload trước 2 ảnh kế tiếp trong ssPhotos để chuyển ảnh không bị khựng.
+   Dùng chung _preloadCache với lightbox (khai báo bên dưới, nhưng do hàm này
+   chỉ chạy khi user bấm mở slideshow — lúc đó toàn bộ script đã load xong —
+   nên không có vấn đề gì về thứ tự khai báo). */
+function preloadSsAround(idx) {
+  [1, 2].forEach(offset => {
+    const n = ssPhotos.length; if (!n) return;
+    const i = (idx + offset) % n;
+    const item = ssPhotos[i];
+    const src  = item?.p?.full || item?.p?.url;
+    if (!src || _preloadCache.has(src)) return;
+    _preloadCache.add(src);
+    new Image().src = src;
+  });
 }
 
 /* ── Progress bar kiểu Story (chỉ khi ssHasProgress = true) ── */
